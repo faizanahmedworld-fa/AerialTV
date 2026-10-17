@@ -27,7 +27,9 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 | `app/src/main/assets/countries.json` | Countries that have a playlist, from iptv-org's `PLAYLISTS.md` |
 | `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists |
 | `tools/icons.ps1` | Draws the launcher icons and the Android TV banner |
-| `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL` |
+| `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL`, plus browser safe copies for the web player |
+| `web/index.html` | The web player for iPhone, iPad (and AirPlay to Apple TV), Chrome and desktop browsers. One file, no build step |
+| `web/countries.json` | Copy of `app/src/main/assets/countries.json` for the web player. Keep the two the same |
 | `docs/Apple.md` | Why there's no iPhone or Apple TV version, and the web player route that gets round it |
 
 ## First time setup on a new PC
@@ -97,6 +99,27 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 * Your own playlist mirror: set `MIRROR_URL` in `app/build.gradle.kts`, for example `https://aerialtv.tv/lists/%s.m3u`. It's tried before the iptv-org hosts. See "Playlist mirror" below for the job that fills it.
 * Country list: `app/src/main/assets/countries.json`.
 
+## Web player
+
+`web/index.html` is Aerial TV for browsers: iPhone and iPad in Safari (and from there to an Apple TV with AirPlay), Chrome on Android, and any laptop. Why it exists and what it can't do is in [docs/Apple.md](docs/Apple.md). It's a single HTML file with the CSS and JavaScript inside, no framework and no build step. Safari plays HLS natively; every other browser loads [hls.js](https://github.com/video-dev/hls.js) from jsDelivr.
+
+What it does: shows the country picker on first visit and remembers the choice and the last channel in `localStorage`, numbers and groups the channels the way the app does (same merging of SD, HD and backup feeds), changes channel with swipe up or down, the arrow keys or Page Up and Page Down, opens the list on a tap, Enter or the left arrow, jumps to a number with the digit keys, and skips a stream that shows no picture within 12 seconds, trying the channel's other feeds first. The AirPlay button appears when Safari finds a receiver on the network.
+
+Try it locally with any static server, for example:
+
+```bash
+python -m http.server 8791 --directory web
+```
+
+Then open `http://localhost:8791/`. Add `?country=pk` to the address to force a country.
+
+To put it on the domain, copy the `web` folder to the web root (`index.html` and `countries.json`). The two settings at the top of `index.html`:
+
+* `PLAYLIST_URL` is where the lists come from, with `%s` standing for the country code. It starts as the public iptv-org list on GitHub raw, and the page then does the browser filter itself (no health check, so dead streams cost 12 seconds each like in the app). Once the mirror runs, change it to `https://aerialtv.tv/lists/%s.web.m3u` and the page gets the pre checked list. See "The web list" below.
+* `COUNTRIES_URL` is the country list, `countries.json` next to the page. If the file is missing, the copy in this repo on GitHub is used.
+
+Things a browser can't do, so don't expect them: `http://` streams, streams that need a custom user agent or referrer, and anything that isn't HLS. The mirror's web list and the page's own filter both drop those.
+
 ## Playlist mirror
 
 A lot of links in the iptv-org lists are dead at any given moment. On 17 October 2026 Pakistan had 34 working streams out of 103, and each dead one costs the viewer up to 12 seconds of black screen while the app skips it. `server/mirror.mjs` does that skipping on a server instead. It downloads each country playlist from GitHub raw, tries every stream the way the app would (same user agent and referrer, 8 second limit, and for HLS it follows the playlist down to a real video segment), then writes a cleaned copy without the dead links.
@@ -109,9 +132,23 @@ Run it locally with Node 18 or newer. There's nothing to install.
 node server/mirror.mjs pk ae
 ```
 
-That writes `server/out/pk.m3u`, `server/out/ae.m3u` and `server/out/status.json` (counts per country plus the time of the run), and prints a line per country such as `pk: 34 alive, 3 geo-blocked kept, 66 dead (of 103)`. Leave the codes off to do every country in `countries.json`. Options: `--out <folder>`, `--concurrency 40` (streams checked at once), `--per-host 4` (so one server isn't flooded and wrongly marked dead), `--timeout 8000` (milliseconds per stream) and `-v` to print the verdict for every stream.
+That writes `server/out/pk.m3u`, `server/out/ae.m3u` and `server/out/status.json` (counts per country plus the time of the run), and prints a line per country such as `pk: 34 alive, 3 geo-blocked kept, 66 dead (of 103), 35 for the web player`. Leave the codes off to do every country in `countries.json`. Options: `--out <folder>`, `--concurrency 40` (streams checked at once), `--per-host 4` (so one server isn't flooded and wrongly marked dead), `--timeout 8000` (milliseconds per stream) and `-v` to print the verdict for every stream.
 
 A country file is only replaced when the run finds at least one working stream, and it's swapped in whole, so the web server never hands out half a list. If GitHub can't be reached, yesterday's file stays.
+
+### The web list
+
+Next to each `pk.m3u` the job writes `pk.web.m3u`: the same working streams, cut down to the ones a browser can play. That means `https://` only (an HTTPS page can't load `http://` video), HLS only (`.m3u8`, the one live format Safari and hls.js both play) and no entry that asks for a user agent or referrer (`http-user-agent` or `http-referrer` in the `#EXTINF` line or on an `#EXTVLCOPT` line), because a browser can't send those. Same file format, same order, same `[Geo-blocked]` tags at the end. The count goes in `status.json` as `web`. A country whose streams are all `http://` gets an empty web list (just the `#EXTM3U` line), and the page tells the viewer to use the Android app.
+
+The web player fetches these lists from JavaScript on a different origin, so nginx has to allow that. In the `location` block that serves the lists:
+
+```
+location /lists/ {
+    add_header Access-Control-Allow-Origin * always;
+}
+```
+
+GitHub raw and jsDelivr already send that header, which is why the page works against iptv-org before the mirror exists.
 
 ### Running it every 6 hours
 

@@ -9,6 +9,9 @@
 // return a playlist whose segments actually download; other links must return media bytes.
 // Dead links are dropped. Geo-blocked links are kept and moved to the end of the file, so the
 // app still has them for viewers inside the right country. Plain Node 18+, no packages.
+//
+// Each country also gets a <code>.web.m3u with only the streams a browser can play (https, HLS,
+// no custom user agent or referrer). That one feeds the web player in web/index.html.
 
 import fs from 'node:fs'
 import path from 'node:path'
@@ -221,6 +224,14 @@ function tagGeo(e) {
   return { ...e, extinf: `${e.extinf} [Geo-blocked]` }
 }
 
+/**
+ * True when a browser can play the stream: an HTTPS page can't load http:// media, Safari and
+ * hls.js only speak HLS, and no browser lets a page set the User-Agent or Referer header.
+ */
+function browserSafe(e) {
+  return /^https:\/\//i.test(e.url) && /\.m3u8(\?|#|$)/i.test(e.url) && !e.ua && !e.ref
+}
+
 function writeAtomic(file, text) {
   const tmp = `${file}.tmp`
   fs.writeFileSync(tmp, text)
@@ -265,9 +276,14 @@ async function runCountry(code) {
     else dead++
   })
 
-  const summary = { code, total: entries.length, alive: alive.length, geo: geo.length, dead }
-  if (alive.length + geo.length === 0) return { ...summary, error: 'no working streams, kept previous file' }
-  writeAtomic(path.join(opts.out, `${code}.m3u`), render(header, [...alive, ...geo]))
+  const kept = [...alive, ...geo]
+  const web = kept.filter(browserSafe)
+  const summary = { code, total: entries.length, alive: alive.length, geo: geo.length, dead, web: web.length }
+  if (kept.length === 0) return { ...summary, error: 'no working streams, kept previous files' }
+  writeAtomic(path.join(opts.out, `${code}.m3u`), render(header, kept))
+  // The web list may be empty for a country whose streams are all http or need a user agent.
+  // An empty list is the truth there, so it's written anyway and the page says so.
+  writeAtomic(path.join(opts.out, `${code}.web.m3u`), render(header, web))
   return summary
 }
 
@@ -285,12 +301,12 @@ async function main() {
     const s = await runCountry(code.toLowerCase())
     report.push(s)
     if (s.error && s.total === undefined) console.log(`${code}: ${s.error}`)
-    else console.log(`${code}: ${s.alive} alive, ${s.geo} geo-blocked kept, ${s.dead} dead (of ${s.total})${s.error ? `, ${s.error}` : ''}`)
+    else console.log(`${code}: ${s.alive} alive, ${s.geo} geo-blocked kept, ${s.dead} dead (of ${s.total}), ${s.web} for the web player${s.error ? `, ${s.error}` : ''}`)
   }
 
   const ok = report.filter((s) => s.total !== undefined)
   const sum = (k) => ok.reduce((a, s) => a + s[k], 0)
-  console.log(`Done in ${Math.round((Date.now() - started) / 1000)}s: ${sum('alive')} alive, ${sum('geo')} geo-blocked kept, ${sum('dead')} dead, ${report.length - ok.length} playlist(s) failed`)
+  console.log(`Done in ${Math.round((Date.now() - started) / 1000)}s: ${sum('alive')} alive, ${sum('geo')} geo-blocked kept, ${sum('dead')} dead, ${sum('web')} for the web player, ${report.length - ok.length} playlist(s) failed`)
 
   writeAtomic(path.join(opts.out, 'status.json'), JSON.stringify({ updated: new Date().toISOString(), countries: report }, null, 2))
 }

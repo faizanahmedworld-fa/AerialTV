@@ -60,9 +60,11 @@ It has limits, and the numbers above show how much they bite:
 * iOS won't start video without a tap, so the first channel needs a press on the screen. After that, swipes work.
 * The page needs to fetch the playlist text, so the server that serves the lists has to send an `Access-Control-Allow-Origin: *` header. GitHub raw and jsDelivr already do. nginx on the mirror needs one line.
 
-The mirror job in `server/mirror.mjs` already decides per stream whether it's alive and what headers it wants, so it can write a second file per country with only the streams a browser can play, for example `pk.web.m3u`. The page stays dumb and the filtering happens once every 6 hours like everything else.
+The mirror job in `server/mirror.mjs` already decides per stream whether it's alive and what headers it wants, so it writes a second file per country with only the streams a browser can play, for example `pk.web.m3u`. The page stays dumb and the filtering happens once every 6 hours like everything else.
 
 The same page works in Chrome on Android (with the hls.js library, since Chrome doesn't play HLS on its own), on Windows and on a Mac. It's the first thing a visitor to aerialtv.tv could use without installing anything.
+
+**Built on 17 October 2026.** The page is `web/index.html`, one file with no build step, plus a copy of the country list next to it. It plays Pakistan's HTTPS HLS streams in Chrome through hls.js and in Safari through the video tag, remembers the country and last channel, changes channel with swipes and arrow keys, skips a dead stream after 12 seconds like the Android app, and shows the AirPlay button when an Apple TV is on the network. Until the mirror is live it reads the raw iptv-org list and applies the browser filter itself (43 of Pakistan's 103 streams on the day it was built). How to put it on the domain is in [BUILDING.md](../BUILDING.md#web-player).
 
 ## Suggested order
 

@@ -94,7 +94,14 @@ If the TV has a Google TV or Android TV badge on the box (some Hisense, Philips 
 
 <br>
 
-Not yet. Apple only allows apps from its App Store, and the App Store doesn't take players that come with channels built in. A web version you can open in Safari and send to an Apple TV with AirPlay is the plan. The full story is in [docs/Apple.md](docs/Apple.md).
+There's no app to install, because Apple only allows apps from its App Store and the App Store doesn't take players that come with channels built in. Instead, Aerial TV runs as a web page in Safari:
+
+1. Open the web player at [aerialtv.tv](https://aerialtv.tv) on your iPhone or iPad (until that address is live, the page is `web/index.html` in this project, so a copy on any web host works).
+2. Pick your country. Tap the picture once to start, then swipe up or down to change channel.
+3. For an Apple TV, tap the AirPlay button at the top of the page and choose your TV. The phone becomes the remote.
+4. To keep it like an app: tap Share in Safari, then **Add to Home Screen**.
+
+Only channels that play in a browser are listed, so the list is shorter than in the Android app. The full story is in [docs/Apple.md](docs/Apple.md).
 
 </details>
 
