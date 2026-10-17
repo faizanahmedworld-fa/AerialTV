@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aerial TV</string>
+
+    <string name="loading_channels">Getting your channels ready…</string>
+    <string name="tuning">Tuning in to %1$s…</string>
+    <string name="channel_off_air">%1$s is off air right now. Trying the next channel.</string>
+    <string name="no_such_channel">There\'s no channel with that number</string>
+    <string name="press_back_again">Press Back again to close Aerial TV</string>
+
+    <string name="error_offline">Can\'t reach the internet. Check your WiFi or cable, then press Try again.</string>
+    <string name="error_no_channels">We couldn\'t find free channels for this country yet. Try another country.</string>
+    <string name="error_all_down">These channels aren\'t answering right now. Check your internet and press Try again.</string>
+    <string name="try_again">Try again</string>
+    <string name="change_country">Change country</string>
+
+    <string name="cat_favorites">♥  Favourites</string>
+    <string name="cat_all">All channels</string>
+    <string name="favorite_added">%1$s added to Favourites</string>
+    <string name="favorite_removed">%1$s removed from Favourites</string>
+
+    <string name="banner_hint">"▲ ▼  change channel   ·   OK  all channels"</string>
+    <string name="guide_hint">Hold OK on a channel to add it to Favourites</string>
+    <string name="legal_note">Aerial TV plays free public streams listed by the iptv-org project. We don\'t host any video.</string>
+
+    <string name="country_title">Where are you watching from?</string>
+    <string name="country_subtitle">Pick your country and we\'ll load its free channels. You can change this later from the channel list.</string>
+    <string name="suggested">Suggested</string>
+    <string name="all_countries">All countries</string>
+</resources>

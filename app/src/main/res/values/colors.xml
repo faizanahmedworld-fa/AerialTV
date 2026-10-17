@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navy">#0E1A3A</color>
+    <color name="navy_dark">#070D1F</color>
+    <color name="screen_blue">#2F6BFF</color>
+    <color name="accent">#FFB020</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B8C2DC</color>
+    <color name="panel">#E6070D1F</color>
+    <color name="item_active">#33FFFFFF</color>
+</resources>
