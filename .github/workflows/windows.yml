@@ -1,0 +1,58 @@
+# Builds the Windows installer and publishes it as a GitHub release.
+# Push a tag like windows-v1.0.1 (matching "version" in windows/package.json) to run it.
+# The app checks these releases on start and offers the update to everyone on an older version.
+
+name: Windows release
+
+on:
+  push:
+    tags:
+      - 'windows-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: windows/package-lock.json
+
+      - name: Check the tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          want="windows-v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$want" ]; then
+            echo "Tag is $GITHUB_REF_NAME but package.json says $want. Raise the version first."
+            exit 1
+          fi
+
+      - run: npm ci
+
+      - run: npm run dist
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Aerial TV for Windows ${{ github.ref_name }}
+          files: windows/dist/*.exe
+          generate_release_notes: true
+
+      - name: Keep the installer from a manual run
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aerial TV Setup
+          path: windows/dist/*.exe
