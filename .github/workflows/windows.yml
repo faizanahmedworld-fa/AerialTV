@@ -49,6 +49,9 @@ jobs:
           name: Aerial TV for Windows ${{ github.ref_name }}
           files: windows/dist/*.exe
           generate_release_notes: true
+          # The Android download button on the front page uses the "latest release" link,
+          # so a Windows release must never become the latest one.
+          make_latest: false
 
       - name: Keep the installer from a manual run
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}

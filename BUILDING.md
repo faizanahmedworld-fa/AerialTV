@@ -74,11 +74,11 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 
 1. In `app/build.gradle.kts`, raise `versionCode` by 1 and set `versionName` (for example `1.1`). Android refuses an update whose `versionCode` isn't higher.
 2. Build with `./gradlew assembleRelease`.
-3. Copy the APK to `release/AerialTV.apk` and commit it. That one file is tracked in git (the rest of the folder is ignored), so the backup link on the main page always serves the current version. Keep the exact name, because the download button points at it too.
+3. Copy the APK to `release/AerialTVAndroid.apk` and commit it. The name says Android because the one file covers Android TV, Fire TV and phones, and the Windows installer sits next to it on the releases page. That one file is tracked in git (the rest of the folder is ignored), so the backup link on the main page always serves the current version. Keep the exact name, because the download button points at it too.
 4. Publish it on GitHub:
 
    ```bash
-   gh release create v1.1 release/AerialTV.apk --title "Aerial TV 1.1" --notes "What changed"
+   gh release create v1.1 release/AerialTVAndroid.apk --title "Aerial TV 1.1" --notes "What changed"
    ```
 
 5. Upload the same file to your website's download link.

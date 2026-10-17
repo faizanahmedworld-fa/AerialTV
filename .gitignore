@@ -10,4 +10,4 @@ release/*
 .kotlin/
 *.apk
 server/out/
-!release/AerialTV.apk
+!release/AerialTVAndroid.apk

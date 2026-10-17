@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/faizanahmedworld-fa/AerialTV/releases/latest/download/AerialTV.apk"><img src="docs/images/download.svg" alt="Download Aerial TV free" width="320"></a>
+  <a href="https://github.com/faizanahmedworld-fa/AerialTV/releases/latest/download/AerialTVAndroid.apk"><img src="docs/images/download.svg" alt="Download Aerial TV free" width="320"></a>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 You'll type this link on the TV, so keep this page open on your phone:
 
 ```
-https://github.com/faizanahmedworld-fa/AerialTV/releases/latest/download/AerialTV.apk
+https://github.com/faizanahmedworld-fa/AerialTV/releases/latest/download/AerialTVAndroid.apk
 ```
 
 Tap your device below.
@@ -118,7 +118,7 @@ Only channels that play in a browser are listed, so the list is shorter than in 
 **The download link won't open on the TV.** Some internet providers block parts of GitHub. This link is the same file from a different address:
 
 ```
-https://raw.githubusercontent.com/faizanahmedworld-fa/AerialTV/main/release/AerialTV.apk
+https://raw.githubusercontent.com/faizanahmedworld-fa/AerialTV/main/release/AerialTVAndroid.apk
 ```
 
 **"Can't reach the internet."**
