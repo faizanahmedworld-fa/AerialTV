@@ -94,14 +94,34 @@ If the TV has a Google TV or Android TV badge on the box (some Hisense, Philips 
 
 <br>
 
-There's no app to install, because Apple only allows apps from its App Store and the App Store doesn't take players that come with channels built in. Instead, Aerial TV runs as a web page in Safari:
+There's no app to install, because Apple only allows apps from its App Store and the App Store doesn't take players that come with channels built in. Instead, Aerial TV runs as a web page in Safari. Open this on the iPhone or iPad:
 
-1. Open the web player at [aerialtv.tv](https://aerialtv.tv) on your iPhone or iPad (until that address is live, the page is `web/index.html` in this project, so a copy on any web host works).
-2. Pick your country. Tap the picture once to start, then swipe up or down to change channel.
-3. For an Apple TV, tap the AirPlay button at the top of the page and choose your TV. The phone becomes the remote.
-4. To keep it like an app: tap Share in Safari, then **Add to Home Screen**.
+```
+https://faizanahmedworld-fa.github.io/AerialTV/
+```
 
-Only channels that play in a browser are listed, so the list is shorter than in the Android app. The full story is in [docs/Apple.md](docs/Apple.md).
+1. Pick your country. Tap the picture once to start, then swipe up or down to change channel.
+2. For an Apple TV, tap the AirPlay button at the top of the page and choose your TV. The phone becomes the remote.
+3. To keep it like an app: tap Share in Safari, then **Add to Home Screen**. It gets its own icon and opens full screen.
+
+Only channels that play in a browser are listed, so the list is shorter than in the Android app, and a few countries have none yet. The page says so and the Android app is the answer there. The full story is in [docs/Apple.md](docs/Apple.md).
+
+</details>
+
+<details>
+<summary><b>Windows PC or laptop</b></summary>
+<br>
+
+1. Download the installer:
+
+   ```
+   https://github.com/faizanahmedworld-fa/AerialTV/releases/download/windows-v1.0.0/Aerial.TV.Setup.1.0.0.exe
+   ```
+
+2. Open the file. If Windows says "Windows protected your PC", click **More info**, then **Run anyway**. It installs in a few seconds with no questions and opens on its own.
+3. Pick your country. Up and down change channel, Enter opens the list, F is full screen.
+
+It checks for a newer version each time it opens and offers to install it. More in [windows/README.md](windows/README.md).
 
 </details>
 
@@ -137,6 +157,6 @@ Aerial TV plays free public streams listed by the open [iptv-org](https://github
 <br>
 
 <p align="center">
-  <sub>Works on Android 5.0 or newer. The app is about 2 MB.<br>
+  <sub>Works on Android 5.0 or newer. The app is about 2 MB. Windows 10 and 11 for the desktop version.<br>
   Building the app yourself? See <a href="BUILDING.md">BUILDING.md</a>.</sub>
 </p>

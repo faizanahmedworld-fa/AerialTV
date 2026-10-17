@@ -74,6 +74,7 @@ GitHub builds and publishes it for you.
    ```
 
 3. The "Windows release" job in the Actions tab builds the installer and creates a release called "Aerial TV for Windows windows-v1.0.1" with the `.exe` attached. Within a day, everyone on an older version gets the update box.
+4. Update the download link in the main [README](../README.md) (the "Windows PC or laptop" section) to the new file name, `Aerial.TV.Setup.1.0.1.exe`.
 
 The tag must start with `windows-v` and match `package.json`, or the job stops. Android releases keep their own `v1.1` style tags, and the Windows app ignores them.
 

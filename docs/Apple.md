@@ -64,11 +64,11 @@ The mirror job in `server/mirror.mjs` already decides per stream whether it's al
 
 The same page works in Chrome on Android (with the hls.js library, since Chrome doesn't play HLS on its own), on Windows and on a Mac. It's the first thing a visitor to aerialtv.tv could use without installing anything.
 
-**Built on 17 October 2026.** The page is `web/index.html`, one file with no build step, plus a copy of the country list next to it. It plays Pakistan's HTTPS HLS streams in Chrome through hls.js and in Safari through the video tag, remembers the country and last channel, changes channel with swipes and arrow keys, skips a dead stream after 12 seconds like the Android app, and shows the AirPlay button when an Apple TV is on the network. Until the mirror is live it reads the raw iptv-org list and applies the browser filter itself (43 of Pakistan's 103 streams on the day it was built). How to put it on the domain is in [BUILDING.md](../BUILDING.md#web-player).
+**Built on 17 October 2026 and live at [faizanahmedworld-fa.github.io/AerialTV](https://faizanahmedworld-fa.github.io/AerialTV/).** GitHub Pages publishes the `web` folder on every push to `main`, so there's no server to run until aerialtv.tv exists. The page is `web/index.html`, one file with no build step, plus a copy of the country list next to it. It plays Pakistan's HTTPS HLS streams in Chrome through hls.js and in Safari through the video tag, remembers the country and last channel, changes channel with swipes and arrow keys, skips a dead stream after 12 seconds like the Android app, and shows the AirPlay button when an Apple TV is on the network. Until the mirror is live it reads the raw iptv-org list and applies the browser filter itself (43 of Pakistan's 103 streams on the day it was built). How to put it on the domain is in [BUILDING.md](../BUILDING.md#web-player).
 
 ## Suggested order
 
-1. Build the web player on the domain, fed by the mirror's browser safe lists. One HTML page, a few days of work, covers iPhone, iPad and Apple TV through AirPlay.
+1. Done: the web player is live on GitHub Pages. Next is moving it to the domain and feeding it the mirror's browser safe lists, because some internet providers block github.io.
 2. Leave native iOS and tvOS until the Android app and the domain are established and people are actually asking. If that day comes, budget for a rejection and have a "paste your own playlist" mode ready as the fallback that gets the app approved.
 3. Skip a Mac app.
 

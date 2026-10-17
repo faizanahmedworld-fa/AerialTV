@@ -113,7 +113,7 @@ python -m http.server 8791 --directory web
 
 Then open `http://localhost:8791/`. Add `?country=pk` to the address to force a country.
 
-To put it on the domain, copy the `web` folder to the web root (`index.html` and `countries.json`). The two settings at the top of `index.html`:
+It's live at `https://faizanahmedworld-fa.github.io/AerialTV/`. The "Web player" job in `.github/workflows/pages.yml` publishes the `web` folder to GitHub Pages on every push to `main` that touches it, and fails on purpose if `web/countries.json` has drifted from the app's copy. Some internet providers block github.io, so the domain is still the end goal. To put it on the domain, copy the `web` folder to the web root (`index.html` and `countries.json`). The two settings at the top of `index.html`:
 
 * `PLAYLIST_URL` is where the lists come from, with `%s` standing for the country code. It starts as the public iptv-org list on GitHub raw, and the page then does the browser filter itself (no health check, so dead streams cost 12 seconds each like in the app). Once the mirror runs, change it to `https://aerialtv.tv/lists/%s.web.m3u` and the page gets the pre checked list. See "The web list" below.
 * `COUNTRIES_URL` is the country list, `countries.json` next to the page. If the file is missing, the copy in this repo on GitHub is used.
