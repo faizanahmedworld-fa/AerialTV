@@ -1,9 +1,11 @@
 package tv.aerialtv.app
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +45,19 @@ class CountryActivity : AppCompatActivity() {
             finish()
         }
         list.post { list.findViewHolderForAdapterPosition(1)?.itemView?.requestFocus() }
+
+        // Back is the one way out that means "I don't want to pick". MainActivity closes the app
+        // on a first run then, and keeps the picker open for any other kind of cancel.
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                setResult(RESULT_CANCELED, Intent().putExtra(EXTRA_USER_CANCELLED, true))
+                finish()
+            }
+        })
+    }
+
+    companion object {
+        const val EXTRA_USER_CANCELLED = "user_cancelled"
     }
 
     private class Adapter(

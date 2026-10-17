@@ -29,6 +29,25 @@ class M3uParserTest {
     }
 
     @Test
+    fun dropsStreamsThePlayerCannotOpen() {
+        val text = """
+            #EXTM3U
+            #EXTINF:-1 tvg-id="One.pk",One
+            rtsp://example.com/live
+            #EXTINF:-1 tvg-id="Two.pk",Two
+            https://example.com/two.m3u8
+            #EXTINF:-1 tvg-id="Two.pk",Two (720p)
+            rtmp://example.com/two
+            #EXTINF:-1 tvg-id="Three.pk",Three
+            HTTP://example.com/three.m3u8
+        """.trimIndent()
+        val channels = M3uParser.parse(text)
+        // A channel with only an rtsp link disappears; the rest keep just their web links.
+        assertEquals(setOf("Two", "Three"), channels.map { it.name }.toSet())
+        assertEquals(1, channels.first { it.name == "Two" }.streams.size)
+    }
+
+    @Test
     fun keepsHeadersFromVlcOptionsAndAttributes() {
         val channels = M3uParser.parse(fixture("ua.m3u"))
         val withAgent = channels.flatMap { it.streams }.filter { it.userAgent != null }

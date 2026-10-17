@@ -38,7 +38,9 @@ object M3uParser {
                 line.startsWith("#") -> Unit
                 else -> {
                     val header = info ?: continue
-                    add(byKey, header, line, userAgent, referrer)
+                    // Only web streams. The player has no rtsp, rtmp or udp support and would
+                    // crash trying, and the iptv-org lists hold a handful of those.
+                    if (isHttp(line)) add(byKey, header, line, userAgent, referrer)
                     info = null
                 }
             }
@@ -91,6 +93,8 @@ object M3uParser {
             )
         }
     }
+
+    private fun isHttp(url: String) = url.startsWith("http://", ignoreCase = true) || url.startsWith("https://", ignoreCase = true)
 
     /** Splits "#EXTINF:-1 a="x, y",Name" at the first comma that is not inside quotes. */
     private fun splitInfo(line: String): Pair<String, String> {

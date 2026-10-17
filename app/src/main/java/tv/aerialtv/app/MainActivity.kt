@@ -21,6 +21,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
@@ -35,6 +36,7 @@ import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -79,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     private var direction = 1
     private var attempts: List<Attempt> = emptyList()
     private var attemptIndex = 0
+    private var retries = 0
     private var wasReady = false
     private var skippedInRow = 0
     private var selectedCategory = ALL
@@ -92,6 +95,7 @@ class MainActivity : AppCompatActivity() {
     private val hideBannerTask = Runnable { banner.visibility = View.GONE }
     private val tunePendingTask = Runnable { if (pending >= 0) tune(pending) }
     private val stallTask = Runnable { tryNextAttempt() }
+    private val retryTask = Runnable { playAttempt() }
     private val digitsTask = Runnable { jumpToNumber() }
     private var categoryTask: Runnable? = null
 
@@ -101,7 +105,12 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             pickingCountry = false
             if (result.resultCode == RESULT_OK) loadChannels()
-            else if (prefs.country == null) finish()
+            else if (prefs.country == null) {
+                // Back on the first run picker closes the app. Anything else that ended the
+                // picker without a choice (Home, then the app icon) just opens it again.
+                if (result.data?.getBooleanExtra(CountryActivity.EXTRA_USER_CANCELLED, false) == true) finish()
+                else openCountryPicker()
+            }
             else if (channels.isNotEmpty() && current >= 0) tune(current)
         }
 
@@ -133,7 +142,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         handler.removeCallbacks(stallTask)
+        handler.removeCallbacks(retryTask)
         handler.removeCallbacks(tunePendingTask)
+        clearDigits()
         player.stop()
     }
 
@@ -195,9 +206,13 @@ class MainActivity : AppCompatActivity() {
                 when (state) {
                     Player.STATE_READY -> {
                         wasReady = true
+                        retries = 0
                         handler.removeCallbacks(stallTask)
                         showLoading(null)
                         skippedInRow = 0
+                        // Remembered only once it has shown a picture, so a dead channel never
+                        // becomes the one the app opens on next time.
+                        channels.getOrNull(current)?.let { ch -> prefs.country?.let { prefs.setLastChannel(it, ch.key) } }
                     }
                     Player.STATE_BUFFERING -> if (wasReady) {
                         // Mid-programme hiccup: give it longer before giving up on this link.
@@ -213,6 +228,16 @@ class MainActivity : AppCompatActivity() {
                 if (error.errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW) {
                     player.seekToDefaultPosition()
                     player.prepare()
+                    return
+                }
+                // A stream that was playing a moment ago has most likely hit a short network
+                // drop, not died. Give it a couple of goes before zapping away from it.
+                if (wasReady && retries < MAX_RETRIES) {
+                    retries++
+                    handler.removeCallbacks(stallTask)
+                    handler.removeCallbacks(retryTask)
+                    showLoading(getString(R.string.tuning, channels[current].name))
+                    handler.postDelayed(retryTask, RETRY_DELAY_MS)
                     return
                 }
                 tryNextAttempt()
@@ -244,6 +269,8 @@ class MainActivity : AppCompatActivity() {
                 val added = prefs.toggleFavorite(ch.key)
                 say(getString(if (added) R.string.favorite_added else R.string.favorite_removed, ch.name))
                 categoryAdapter.submit(buildCategories())
+                // Taking a channel out of Favourites while looking at that list removes its row.
+                if (selectedCategory == FAVORITES) showCategory(FAVORITES)
             },
         )
         categoryList.layoutManager = LinearLayoutManager(this)
@@ -308,6 +335,7 @@ class MainActivity : AppCompatActivity() {
         val code = prefs.country ?: return
         loadJob?.cancel()
         handler.removeCallbacks(stallTask)
+        handler.removeCallbacks(retryTask)
         player.stop()
         hideMessage()
         hideGuide()
@@ -316,6 +344,7 @@ class MainActivity : AppCompatActivity() {
 
         loadJob = lifecycleScope.launch {
             val result = runCatching { repo.load(code) }
+            if (!isActive) return@launch
             val list = result.getOrNull().orEmpty()
             if (list.isEmpty()) {
                 channels = emptyList()
@@ -355,10 +384,10 @@ class MainActivity : AppCompatActivity() {
         current = i
 
         val ch = channels[i]
-        prefs.country?.let { prefs.setLastChannel(it, ch.key) }
         channelAdapter.playingKey = ch.key
         attempts = ch.streams.flatMap(::attemptsFor)
         attemptIndex = 0
+        retries = 0
         hideMessage()
         showBanner(ch)
         playAttempt()
@@ -375,10 +404,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playAttempt() {
+        // Home was pressed while this was in flight. onStart tunes again when the app comes back.
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
         val attempt = attempts.getOrNull(attemptIndex) ?: return skipChannel()
         val ch = channels[current]
         showLoading(getString(R.string.tuning, ch.name))
         wasReady = false
+        handler.removeCallbacks(retryTask)
 
         val http = DefaultHttpDataSource.Factory()
             .setUserAgent(attempt.stream.userAgent ?: DEFAULT_USER_AGENT)
@@ -391,9 +423,12 @@ class MainActivity : AppCompatActivity() {
             .setUri(attempt.stream.url)
             .apply { attempt.mimeType?.let { setMimeType(it) } }
             .build()
-        val source = DefaultMediaSourceFactory(this)
-            .setDataSourceFactory(DefaultDataSource.Factory(this, http))
-            .createMediaSource(item)
+        // Media3 throws for a scheme it has no module for (rtsp, rtmp). Treat that as a dead link.
+        val source = runCatching {
+            DefaultMediaSourceFactory(this)
+                .setDataSourceFactory(DefaultDataSource.Factory(this, http))
+                .createMediaSource(item)
+        }.getOrElse { return tryNextAttempt() }
 
         player.setMediaSource(source)
         player.prepare()
@@ -404,7 +439,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun tryNextAttempt() {
         handler.removeCallbacks(stallTask)
+        handler.removeCallbacks(retryTask)
         if (current < 0 || channels.isEmpty()) return
+        retries = 0
         attemptIndex++
         if (attemptIndex < attempts.size) playAttempt() else skipChannel()
     }
@@ -589,6 +626,8 @@ class MainActivity : AppCompatActivity() {
         const val START_TIMEOUT_MS = 12_000L
         const val STALL_MS = 20_000L
         const val MAX_SKIPS = 12
+        const val MAX_RETRIES = 2
+        const val RETRY_DELAY_MS = 3_000L
         const val DEFAULT_USER_AGENT =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
     }
