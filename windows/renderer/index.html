@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src * data: blob:; media-src * blob: data:; connect-src *; worker-src 'self' blob:">
+  <title>Aerial TV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="idle">
+  <video id="video" autoplay></video>
+
+  <!-- Tuning / loading -->
+  <div id="loading" class="hidden">
+    <div class="spinner"></div>
+    <div id="loadingText"></div>
+  </div>
+
+  <!-- Channel banner, shown when the channel changes -->
+  <div id="banner" class="hidden">
+    <div id="bannerNumber"></div>
+    <img id="bannerLogo" alt="">
+    <div class="bannerText">
+      <div id="bannerName"></div>
+      <div id="bannerInfo"></div>
+      <div class="hint">&#9650; &#9660;  change channel   &middot;   Enter  all channels</div>
+    </div>
+  </div>
+
+  <div id="numberEntry" class="hidden"></div>
+
+  <!-- Mouse controls, shown while the mouse moves -->
+  <div id="controls">
+    <button id="ctlDown" title="Previous channel (Down arrow)">
+      <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <button id="ctlUp" title="Next channel (Up arrow)">
+      <svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
+    </button>
+    <button id="ctlGuide" class="wide" title="Channel list (Enter)">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span>Channels</span>
+    </button>
+    <div class="spacer"></div>
+    <button id="ctlMute" title="Mute (M)">
+      <svg viewBox="0 0 24 24"><path class="speaker" d="M4 9v6h4l5 4V5L8 9z"/><path class="waves" d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/><path class="cross" d="M16 9l5 6M21 9l-5 6"/></svg>
+    </button>
+    <input id="ctlVolume" type="range" min="0" max="100" step="1" title="Volume (mouse wheel)">
+    <button id="ctlFull" title="Full screen (F or double click)">
+      <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+  </div>
+
+  <!-- Channel list -->
+  <div id="guide" class="hidden">
+    <div class="guidePanel">
+      <div class="guideTop">
+        <div class="brand">
+          <svg class="mark" viewBox="24 20 60 58"><use href="#tvmark"/></svg>
+          <span>Aerial <b>TV</b></span>
+        </div>
+        <button id="guideCountry" class="pill">Change country</button>
+      </div>
+      <div class="guideBody">
+        <div id="categoryList" class="list"></div>
+        <div id="channelList" class="list"></div>
+      </div>
+      <div class="guideFoot">
+        <span>Right click a channel, or press F on it, to add it to Favourites</span>
+        <span class="footRight"><span id="version"></span> &middot; <a href="#" id="checkUpdate">Check for updates</a></span>
+      </div>
+      <div class="legal">Aerial TV plays free public streams listed by the iptv-org project. We don't host any video.</div>
+    </div>
+    <div class="guideShade"></div>
+  </div>
+
+  <!-- Problems (no internet, nothing playing) -->
+  <div id="message" class="hidden">
+    <svg class="mark big" viewBox="24 20 60 58"><use href="#tvmark"/></svg>
+    <div id="messageText"></div>
+    <div class="buttons">
+      <button id="retryButton" class="pill solid">Try again</button>
+      <button id="messageCountryButton" class="pill">Change country</button>
+    </div>
+  </div>
+
+  <!-- Country picker, first run and from the channel list -->
+  <div id="picker" class="hidden">
+    <div class="pickerInner">
+      <svg class="mark big" viewBox="24 20 60 58"><use href="#tvmark"/></svg>
+      <h1>Where are you watching from?</h1>
+      <p>Pick your country and we'll load its free channels. You can change this later from the channel list.</p>
+      <input id="countrySearch" type="search" placeholder="Type to search" spellcheck="false" autocomplete="off">
+      <div id="countryList" class="list"></div>
+    </div>
+  </div>
+
+  <div id="update" class="hidden">
+    <div id="updateText"></div>
+    <div class="bar"><div id="updateBar"></div></div>
+    <div class="buttons">
+      <button id="updateNow" class="pill solid">Update now</button>
+      <button id="updateLater" class="pill">Later</button>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <g id="tvmark">
+        <path d="M54 40L42 27M54 40l12-13" stroke="#FFB020" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <circle cx="42" cy="27" r="3" fill="#FFB020"/>
+        <circle cx="66" cy="27" r="3" fill="#FFB020"/>
+        <rect x="30" y="40" width="48" height="34" rx="7" fill="#FFFFFF"/>
+        <rect x="35" y="45" width="38" height="24" rx="4" fill="#2F6BFF"/>
+        <path d="M50 51l10 6-10 6z" fill="#FFFFFF"/>
+      </g>
+    </defs>
+  </svg>
+
+  <script src="../node_modules/hls.js/dist/hls.min.js"></script>
+  <script src="../node_modules/mpegts.js/dist/mpegts.js"></script>
+  <script src="m3u.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

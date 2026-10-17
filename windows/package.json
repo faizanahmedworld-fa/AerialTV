@@ -1,0 +1,76 @@
+{
+  "name": "aerial-tv",
+  "productName": "Aerial TV",
+  "version": "1.0.0",
+  "description": "Free live TV for Windows",
+  "author": "Faizan Ahmed",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --publish never"
+  },
+  "dependencies": {
+    "country-flag-emoji-polyfill": "0.1.10",
+    "hls.js": "1.7.3",
+    "mpegts.js": "1.8.2"
+  },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "tv.aerialtv.app",
+    "productName": "Aerial TV",
+    "copyright": "Aerial TV",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**",
+      "package.json",
+      "!node_modules/hls.js/**",
+      "node_modules/hls.js/package.json",
+      "node_modules/hls.js/dist/hls.min.js",
+      "!node_modules/mpegts.js/**",
+      "node_modules/mpegts.js/package.json",
+      "node_modules/mpegts.js/dist/mpegts.js",
+      "!node_modules/country-flag-emoji-polyfill/**",
+      "node_modules/country-flag-emoji-polyfill/package.json",
+      "node_modules/country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2"
+    ],
+    "electronLanguages": [
+      "en-US"
+    ],
+    "extraResources": [
+      {
+        "from": "../app/src/main/assets/countries.json",
+        "to": "countries.json"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "Aerial TV Setup ${version}.${ext}",
+      "shortcutName": "Aerial TV",
+      "uninstallDisplayName": "Aerial TV",
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": null
+  }
+}
