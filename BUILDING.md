@@ -78,7 +78,7 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 4. Publish it on GitHub:
 
    ```bash
-   gh release create v1.1 release/AerialTVAndroid.apk --title "Aerial TV 1.1" --notes "What changed"
+   gh release create v1.1 release/AerialTVAndroid.apk --title "Aerial TV for Android 1.1" --notes "What changed"
    ```
 
 5. Upload the same file to your website's download link.
