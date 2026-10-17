@@ -28,6 +28,7 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 | `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists |
 | `tools/icons.ps1` | Draws the launcher icons and the Android TV banner |
 | `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL` |
+| `docs/Apple.md` | Why there's no iPhone or Apple TV version, and the web player route that gets round it |
 
 ## First time setup on a new PC
 

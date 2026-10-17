@@ -79,6 +79,14 @@ Aerial TV now has its own tile on the TV's home screen.
 
 </details>
 
+<details>
+<summary><b>iPhone, iPad or Apple TV</b></summary>
+<br>
+
+Not yet. Apple only allows apps from its App Store, and the App Store doesn't take players that come with channels built in. A web version you can open in Safari and send to an Apple TV with AirPlay is the plan. The full story is in [docs/Apple.md](docs/Apple.md).
+
+</details>
+
 <br>
 
 <p align="center">
