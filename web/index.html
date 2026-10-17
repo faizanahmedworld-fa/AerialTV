@@ -16,20 +16,26 @@
 // ============================================================================================
 // Settings. Change these two lines when the mirror is live.
 //
-// PLAYLIST_URL: where the country playlists come from. %s becomes the country code (pk, ae...).
-// The default is the public iptv-org list on GitHub raw, which works before the mirror exists.
-// Once server/mirror.mjs runs on your domain, point this at its web lists, for example
+// PLAYLIST_URLS: where the country playlists come from, tried in order until one answers.
+// %s becomes the country code (pk, ae...). The defaults are the public iptv-org list from
+// GitHub raw, then the same list through jsDelivr, then iptv-org's own GitHub Pages copy, the
+// same three sources the Android app uses, because some internet providers block one of them.
+// Once server/mirror.mjs runs on your domain, put its web lists first, for example
 // 'https://aerialtv.tv/lists/%s.web.m3u'. Whatever the source, the page keeps only streams a
 // browser can play (https, HLS, no custom user agent or referrer). On the mirror's web list that
 // filter changes nothing. On the raw iptv-org list it does the mirror's job client side, minus
 // the health check, so dead streams are skipped at 12 seconds each like in the Android app.
 //
 // COUNTRIES_URL: the country list. countries.json sits next to this page (a copy of
-// app/src/main/assets/countries.json). If it isn't there, the repo's copy on GitHub is used.
+// app/src/main/assets/countries.json). If it isn't there, the repo's copy on jsDelivr is used.
 // ============================================================================================
-const PLAYLIST_URL = 'https://raw.githubusercontent.com/iptv-org/iptv/gh-pages/countries/%s.m3u'
+const PLAYLIST_URLS = [
+  'https://raw.githubusercontent.com/iptv-org/iptv/gh-pages/countries/%s.m3u',
+  'https://cdn.jsdelivr.net/gh/iptv-org/iptv@gh-pages/countries/%s.m3u',
+  'https://iptv-org.github.io/iptv/countries/%s.m3u',
+]
 const COUNTRIES_URL = 'countries.json'
-const COUNTRIES_FALLBACK_URL = 'https://raw.githubusercontent.com/faizanahmedworld-fa/AerialTV/main/app/src/main/assets/countries.json'
+const COUNTRIES_FALLBACK_URL = 'https://cdn.jsdelivr.net/gh/faizanahmedworld-fa/AerialTV@main/web/countries.json'
 const HLS_JS_URL = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js'
 const START_TIMEOUT_MS = 12000  // give a stream this long to show a picture before moving on
 const MAX_SKIPS = 12            // stop zapping after this many dead channels in a row
@@ -554,11 +560,16 @@ async function loadCountry() {
   showLoading(`Loading ${country.name} channels`)
 
   let text
-  try {
-    const r = await fetch(PLAYLIST_URL.replace('%s', country.code), { cache: 'no-cache' })
-    if (!r.ok) throw new Error(`HTTP ${r.status}`)
-    text = await r.text()
-  } catch (err) {
+  for (const url of PLAYLIST_URLS) {
+    try {
+      const r = await fetch(url.replace('%s', country.code), { cache: 'no-cache' })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      text = await r.text()
+      break
+    } catch (err) {}
+    if (token !== loadToken) return
+  }
+  if (text === undefined) {
     if (token !== loadToken) return
     showMessage("Can't reach the channel list", 'Check your internet connection, then try again.', { label: 'Try again', onClick: loadCountry })
     return

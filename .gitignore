@@ -11,3 +11,4 @@ release/*
 *.apk
 server/out/
 !release/AerialTVAndroid.apk
+.netlify/

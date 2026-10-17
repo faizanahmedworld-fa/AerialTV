@@ -1,0 +1,9 @@
+# Netlify serves the web folder as is: no build step, just index.html and countries.json.
+[build]
+  publish = "web"
+  command = ""
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300"
