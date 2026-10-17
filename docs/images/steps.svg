@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13234F"/>
+      <stop offset="1" stop-color="#070D1F"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B78FF"/>
+      <stop offset="1" stop-color="#1D47C9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="420" rx="28" fill="url(#bg)"/>
+
+  <text x="640" y="72" text-anchor="middle" font-size="34" font-weight="800" fill="#FFFFFF">Watching in 3 steps</text>
+  <text x="640" y="110" text-anchor="middle" font-size="20" fill="#8A97BA">About 5 minutes, and you only do it once</text>
+
+  <!-- arrows between cards -->
+  <g stroke="#FFB020" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M430 262 H462 M452 250 L464 262 L452 274"/>
+    <path d="M818 262 H850 M840 250 L852 262 L840 274"/>
+  </g>
+
+  <!-- card 1: download -->
+  <g>
+    <rect x="64" y="146" width="354" height="234" rx="22" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <circle cx="112" cy="194" r="24" fill="#FFB020"/>
+    <text x="112" y="203" text-anchor="middle" font-size="24" font-weight="800" fill="#0E1A3A">1</text>
+    <circle cx="340" cy="210" r="42" fill="url(#blue)"/>
+    <path d="M340 186 V222 M326 208 L340 222 L354 208" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M322 232 H358" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+    <text x="96" y="300" font-size="28" font-weight="700" fill="#FFFFFF">Download</text>
+    <text x="96" y="334" font-size="19" fill="#B8C2DC">Get the free Downloader</text>
+    <text x="96" y="360" font-size="19" fill="#B8C2DC">app and open our link</text>
+  </g>
+
+  <!-- card 2: install -->
+  <g>
+    <rect x="463" y="146" width="354" height="234" rx="22" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <circle cx="511" cy="194" r="24" fill="#FFB020"/>
+    <text x="511" y="203" text-anchor="middle" font-size="24" font-weight="800" fill="#0E1A3A">2</text>
+    <circle cx="739" cy="210" r="42" fill="url(#blue)"/>
+    <rect x="717" y="190" width="44" height="40" rx="8" stroke="#FFFFFF" stroke-width="5" fill="none"/>
+    <path d="M728 211 L737 220 L751 202" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="495" y="300" font-size="28" font-weight="700" fill="#FFFFFF">Install</text>
+    <text x="495" y="334" font-size="19" fill="#B8C2DC">Press Install, then Open.</text>
+    <text x="495" y="360" font-size="19" fill="#B8C2DC">No account needed</text>
+  </g>
+
+  <!-- card 3: watch -->
+  <g>
+    <rect x="862" y="146" width="354" height="234" rx="22" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <circle cx="910" cy="194" r="24" fill="#FFB020"/>
+    <text x="910" y="203" text-anchor="middle" font-size="24" font-weight="800" fill="#0E1A3A">3</text>
+    <circle cx="1138" cy="210" r="42" fill="url(#blue)"/>
+    <path d="M1128 192 L1154 210 L1128 228 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"/>
+    <text x="894" y="300" font-size="28" font-weight="700" fill="#FFFFFF">Watch</text>
+    <text x="894" y="334" font-size="19" fill="#B8C2DC">Pick your country once.</text>
+    <text x="894" y="360" font-size="19" fill="#B8C2DC">TV starts playing</text>
+  </g>
+</svg>

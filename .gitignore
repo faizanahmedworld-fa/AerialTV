@@ -4,11 +4,9 @@ app/build/
 local.properties
 .idea/
 *.iml
-.claude/
 signing/
 keystore.properties
 release/
 .kotlin/
 *.apk
-server/out/
 server/out/

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="96" viewBox="0 0 400 96" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC24A"/>
+      <stop offset="1" stop-color="#FFA000"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="392" height="88" rx="44" fill="url(#gold)"/>
+  <circle cx="54" cy="48" r="28" fill="#0E1A3A"/>
+  <path d="M54 34 V58 M44 49 L54 59 L64 49" stroke="#FFB020" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text x="96" y="46" font-size="28" font-weight="800" fill="#0E1A3A">Download free</text>
+  <text x="97" y="72" font-size="17" font-weight="600" fill="#0E1A3A" fill-opacity="0.75">Android TV, Fire TV and phones</text>
+</svg>

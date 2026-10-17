@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="580" viewBox="0 0 1280 580" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13234F"/>
+      <stop offset="1" stop-color="#070D1F"/>
+    </linearGradient>
+    <linearGradient id="remote" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2A3557"/>
+      <stop offset="0.5" stop-color="#36436B"/>
+      <stop offset="1" stop-color="#2A3557"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B78FF"/>
+      <stop offset="1" stop-color="#1D47C9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="580" rx="28" fill="url(#bg)"/>
+
+  <text x="64" y="76" font-size="34" font-weight="800" fill="#FFFFFF">Easy as a normal TV</text>
+  <text x="64" y="112" font-size="20" fill="#8A97BA">Everything works from the remote you already have</text>
+
+  <!-- remote -->
+  <g>
+    <rect x="200" y="150" width="190" height="400" rx="70" fill="url(#remote)" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="2"/>
+    <!-- d-pad -->
+    <circle cx="295" cy="250" r="70" fill="#1B2440" stroke="#FFFFFF" stroke-opacity="0.15"/>
+    <circle cx="295" cy="250" r="30" fill="#FFB020"/>
+    <text x="295" y="258" text-anchor="middle" font-size="20" font-weight="800" fill="#0E1A3A">OK</text>
+    <g fill="#FFFFFF">
+      <path d="M295 190 L306 204 H284 Z"/>
+      <path d="M295 310 L306 296 H284 Z"/>
+      <path d="M235 250 L249 239 V261 Z"/>
+      <path d="M355 250 L341 239 V261 Z"/>
+    </g>
+    <!-- back and home -->
+    <circle cx="250" cy="355" r="20" fill="#1B2440"/>
+    <path d="M258 349 H247 a7 7 0 0 0 0 14 H254 M249 343 L243 349 L249 355" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="340" cy="355" r="20" fill="#1B2440"/>
+    <path d="M331 357 L340 348 L349 357 V365 H331 Z" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linejoin="round"/>
+    <!-- number pad -->
+    <g fill="#1B2440">
+      <circle cx="250" cy="415" r="15"/><circle cx="295" cy="415" r="15"/><circle cx="340" cy="415" r="15"/>
+      <circle cx="250" cy="455" r="15"/><circle cx="295" cy="455" r="15"/><circle cx="340" cy="455" r="15"/>
+      <circle cx="250" cy="495" r="15"/><circle cx="295" cy="495" r="15"/><circle cx="340" cy="495" r="15"/>
+    </g>
+    <g font-size="14" font-weight="700" fill="#B8C2DC" text-anchor="middle">
+      <text x="250" y="420">1</text><text x="295" y="420">2</text><text x="340" y="420">3</text>
+      <text x="250" y="460">4</text><text x="295" y="460">5</text><text x="340" y="460">6</text>
+      <text x="250" y="500">7</text><text x="295" y="500">8</text><text x="340" y="500">9</text>
+    </g>
+  </g>
+
+  <!-- leader lines -->
+  <g stroke="#FFB020" stroke-opacity="0.7" stroke-width="2" fill="none" stroke-dasharray="4 5">
+    <path d="M312 197 H490 V178 H520"/>
+    <path d="M327 250 H520"/>
+    <path d="M362 262 H470 V322 H520"/>
+    <path d="M250 375 V387 H470 V398 H520"/>
+    <path d="M358 455 H470 V474 H520"/>
+  </g>
+  <g fill="#FFB020">
+    <circle cx="312" cy="197" r="5"/><circle cx="327" cy="250" r="5"/><circle cx="362" cy="262" r="5"/><circle cx="250" cy="375" r="5"/><circle cx="358" cy="455" r="5"/>
+  </g>
+
+  <!-- labels -->
+  <g>
+    <text x="536" y="174" font-size="24" font-weight="700" fill="#FFFFFF">Up or Down</text>
+    <text x="536" y="200" font-size="19" fill="#B8C2DC">Change channel</text>
+
+    <text x="536" y="246" font-size="24" font-weight="700" fill="#FFFFFF">OK</text>
+    <text x="536" y="272" font-size="19" fill="#B8C2DC">See all channels. Hold OK to save a favourite</text>
+
+    <text x="536" y="318" font-size="24" font-weight="700" fill="#FFFFFF">Right</text>
+    <text x="536" y="344" font-size="19" fill="#B8C2DC">See what's on now</text>
+
+    <text x="536" y="394" font-size="24" font-weight="700" fill="#FFFFFF">Back twice</text>
+    <text x="536" y="420" font-size="19" fill="#B8C2DC">Close the app</text>
+
+    <text x="536" y="470" font-size="24" font-weight="700" fill="#FFFFFF">Numbers</text>
+    <text x="536" y="496" font-size="19" fill="#B8C2DC">Jump straight to a channel</text>
+  </g>
+
+  <!-- phone -->
+  <g>
+    <rect x="1018" y="170" width="190" height="360" rx="30" fill="#FFFFFF"/>
+    <rect x="1030" y="196" width="166" height="308" rx="16" fill="url(#blue)"/>
+    <rect x="1088" y="180" width="50" height="7" rx="3.5" fill="#0E1A3A" fill-opacity="0.25"/>
+    <!-- swipe arrows -->
+    <g stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M1113 260 V320 M1099 274 L1113 260 L1127 274"/>
+      <path d="M1113 380 V440 M1099 426 L1113 440 L1127 426"/>
+    </g>
+    <circle cx="1113" cy="350" r="14" fill="#FFB020"/>
+    <circle cx="1113" cy="350" r="24" fill="none" stroke="#FFB020" stroke-opacity="0.5" stroke-width="3"/>
+    <text x="1113" y="236" text-anchor="middle" font-size="15" font-weight="700" fill="#FFFFFF">Swipe</text>
+    <text x="1113" y="480" text-anchor="middle" font-size="15" font-weight="700" fill="#FFFFFF">Tap for list</text>
+  </g>
+  <text x="1113" y="150" text-anchor="middle" font-size="20" font-weight="700" fill="#FFFFFF">On a phone</text>
+</svg>

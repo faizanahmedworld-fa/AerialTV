@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#13234F"/>
+      <stop offset="1" stop-color="#070D1F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2F6BFF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowGold" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFB020" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#FFB020" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B78FF"/>
+      <stop offset="1" stop-color="#1D47C9"/>
+    </linearGradient>
+    <clipPath id="card"><rect width="1280" height="640" rx="28"/></clipPath>
+    <clipPath id="scr"><rect x="752" y="214" width="420" height="250" rx="14"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#card)">
+    <rect width="1280" height="640" fill="url(#bg)"/>
+    <circle cx="960" cy="330" r="380" fill="url(#glow)"/>
+    <circle cx="140" cy="560" r="260" fill="url(#glowGold)"/>
+    <!-- signal rings -->
+    <g fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="2">
+      <circle cx="962" cy="120" r="120"/>
+      <circle cx="962" cy="120" r="200"/>
+      <circle cx="962" cy="120" r="290"/>
+      <circle cx="962" cy="120" r="390"/>
+    </g>
+  </g>
+
+  <!-- FREE TV badge -->
+  <rect x="88" y="120" width="186" height="52" rx="26" fill="#FFB020"/>
+  <text x="181" y="155" text-anchor="middle" font-size="26" font-weight="800" fill="#0E1A3A" letter-spacing="3">FREE TV</text>
+
+  <text x="84" y="270" font-size="96" font-weight="800" fill="#FFFFFF" letter-spacing="-2">Aerial TV</text>
+  <text x="88" y="330" font-size="30" fill="#B8C2DC">Live TV from 189 countries.</text>
+  <text x="88" y="372" font-size="30" fill="#B8C2DC">Switch it on and it plays, like a normal TV.</text>
+
+  <!-- chips -->
+  <g font-size="22" font-weight="600" fill="#FFFFFF">
+    <rect x="88" y="420" width="180" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.18"/>
+    <circle cx="114" cy="444" r="9" fill="#3DDC84"/>
+    <path d="M109.5 444 l3.2 3.2 l5.8 -6.2" stroke="#0E1A3A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="132" y="452">No sign up</text>
+
+    <rect x="282" y="420" width="226" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.18"/>
+    <circle cx="308" cy="444" r="9" fill="#3DDC84"/>
+    <path d="M303.5 444 l3.2 3.2 l5.8 -6.2" stroke="#0E1A3A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="326" y="452">No monthly fee</text>
+  </g>
+
+  <text x="88" y="540" font-size="22" fill="#8A97BA" letter-spacing="1">ANDROID TV   •   FIRE TV STICK   •   ANDROID PHONE</text>
+
+  <!-- TV illustration -->
+  <g>
+    <!-- antenna -->
+    <path d="M962 196 L912 132 M962 196 L1012 132" stroke="#FFB020" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="908" cy="127" r="12" fill="#FFB020"/>
+    <circle cx="1016" cy="127" r="12" fill="#FFB020"/>
+    <!-- body -->
+    <rect x="732" y="194" width="460" height="290" rx="30" fill="#FFFFFF"/>
+    <!-- stand -->
+    <path d="M902 484 L882 528 M1022 484 L1042 528" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+    <rect x="852" y="522" width="220" height="12" rx="6" fill="#FFFFFF" fill-opacity="0.85"/>
+    <!-- screen -->
+    <rect x="752" y="214" width="420" height="250" rx="14" fill="url(#screen)"/>
+    <g clip-path="url(#scr)">
+      <!-- channel list panel -->
+      <rect x="752" y="214" width="170" height="250" fill="#070D1F" fill-opacity="0.82"/>
+      <g font-size="15" fill="#FFFFFF">
+        <rect x="762" y="230" width="150" height="36" rx="8" fill="#FFFFFF" fill-opacity="0.2"/>
+        <text x="774" y="254" font-weight="700"><tspan fill="#FFB020">1</tspan>   News</text>
+        <text x="774" y="298"><tspan fill="#8A97BA">2</tspan>   Sports</text>
+        <text x="774" y="338"><tspan fill="#8A97BA">3</tspan>   Kids</text>
+        <text x="774" y="378"><tspan fill="#8A97BA">4</tspan>   Movies</text>
+        <text x="774" y="418"><tspan fill="#8A97BA">5</tspan>   Music</text>
+        <text x="774" y="452" fill-opacity="0.5"><tspan fill="#8A97BA">6</tspan>   Cooking</text>
+      </g>
+      <!-- picture area -->
+      <circle cx="1100" cy="250" r="120" fill="#FFFFFF" fill-opacity="0.07"/>
+      <circle cx="1047" cy="339" r="44" fill="#FFFFFF" fill-opacity="0.95"/>
+      <path d="M1034 317 L1066 339 L1034 361 Z" fill="#2F6BFF"/>
+      <!-- live badge -->
+      <rect x="1094" y="230" width="62" height="26" rx="6" fill="#FF3B4E"/>
+      <circle cx="1108" cy="243" r="4.5" fill="#FFFFFF"/>
+      <text x="1118" y="249" font-size="14" font-weight="800" fill="#FFFFFF">LIVE</text>
+      <!-- bottom hint bar -->
+      <rect x="922" y="424" width="250" height="40" fill="#070D1F" fill-opacity="0.55"/>
+      <text x="1047" y="449" text-anchor="middle" font-size="14" fill="#FFFFFF" fill-opacity="0.9">▲ ▼ change channel</text>
+    </g>
+  </g>
+</svg>

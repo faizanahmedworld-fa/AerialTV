@@ -1,142 +1,109 @@
-# Aerial TV
+<p align="center">
+  <img src="docs/images/hero.svg" alt="Aerial TV. Free live TV from 189 countries on Android TV, Fire TV Stick and Android phones." width="100%">
+</p>
 
-Free live TV for people who just want to switch on and watch. Install the APK on an Android TV box, a Fire TV Stick or a phone, pick your country once, and it opens straight onto a channel. Up and down on the remote change channel. OK opens the channel list.
+<p align="center">
+  <a href="https://github.com/faizanahmedworld-fa/AerialTV/releases/latest/download/AerialTV.apk"><img src="docs/images/download.svg" alt="Download Aerial TV free" width="320"></a>
+</p>
 
-Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) playlists (11,000+ streams, CC0 licence). Aerial TV hosts no video.
+<p align="center">
+  <b>Free live TV on the TV box, Fire TV Stick or phone you already own.</b><br>
+  No account to make and no monthly bill. Pick your country once and it plays.
+</p>
 
-**Setting up a TV?** Read [INSTALL.md](INSTALL.md). The rest of this page is for building the app.
+<br>
 
-## What the app does
+<p align="center">
+  <img src="docs/images/steps.svg" alt="Step 1 download, step 2 install, step 3 pick your country and watch" width="100%">
+</p>
 
-* Opens on the last channel you watched, like a normal TV.
-* Remote: ▲ ▼ or CH+ CH− change channel, OK or ◀ opens the list, ▶ shows what's on, number keys jump to a channel, Back twice closes.
-* Phone: tap for the list, swipe up or down to change channel.
-* Dead streams are skipped on their own. Each channel keeps all its backup links (SD, HD, mirrors) and tries them in turn, 12 seconds each, before moving to the next channel.
-* Guesses the country from the mobile network, SIM, time zone, then device language. TV boxes usually ship in US English but with the right time zone, so the time zone does most of the work.
-* Favourites: hold OK on a channel.
-* Playlists come from iptv-org.github.io, GitHub raw and jsDelivr, started 2.5 seconds apart, and the first good answer wins. Some ISPs block github.io. The last good list is cached for 6 hours and used offline.
-* Android 5.0 and up. APK is about 2 MB.
+## Install it
 
-## Project layout
+You'll type this link on the TV, so keep this page open on your phone:
 
-| Path | What's in it |
-| --- | --- |
-| `app/src/main/java/tv/aerialtv/app/MainActivity.kt` | The TV screen: player, remote keys, channel list, auto skip |
-| `app/src/main/java/tv/aerialtv/app/CountryActivity.kt` | First run country picker |
-| `app/src/main/java/tv/aerialtv/app/M3uParser.kt` | Reads iptv-org playlists and merges feeds of the same channel |
-| `app/src/main/java/tv/aerialtv/app/ChannelRepository.kt` | Downloads and caches playlists |
-| `app/src/main/java/tv/aerialtv/app/Prefs.kt` | Saved country, last channel, favourites, country detection |
-| `app/src/main/assets/countries.json` | Countries that have a playlist, from iptv-org's `PLAYLISTS.md` |
-| `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists |
-| `tools/icons.ps1` | Draws the launcher icons and the Android TV banner |
-| `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL` |
-
-## First time setup on a new PC
-
-1. Install JDK 17 (Temurin from adoptium.net is fine).
-2. Install Android Studio, or just the Android command line tools, and add **Android SDK Platform 35** and **Build Tools 35**.
-3. Create `local.properties` in the project folder with one line pointing at the SDK, using forward slashes:
-
-   ```
-   sdk.dir=C:/Users/you/AppData/Local/Android/Sdk
-   ```
-
-4. Put the signing key back: copy `aerialtv-release.jks` into a `signing` folder and `keystore.properties` into the project folder. Both come from your backup. Without them the build still works but makes an unsigned APK.
-
-On Faizan's PC, JDK 17 and the SDK already live in `C:\Users\faiza\AndroidBuild`. Point `JAVA_HOME` there first, because the system Java is version 8:
-
-```bash
-export JAVA_HOME="/c/Users/faiza/AndroidBuild/jdk/jdk-17.0.20.1+1"
+```
+https://github.com/faizanahmedworld-fa/AerialTV/releases/latest/download/AerialTV.apk
 ```
 
-## Build
+Tap your device below.
 
-```bash
-./gradlew assembleRelease
-```
+<details>
+<summary><b>Amazon Fire TV Stick</b></summary>
+<br>
 
-The signed APK lands in `app/build/outputs/apk/release/app-release.apk`.
+1. On the home screen, search for **Downloader** and install it. It's free.
+2. Go to **Settings → My Fire TV → Developer options → Install unknown apps** and switch on **Downloader**.
+   Can't see Developer options? Open **About**, click your device name 7 times, then go back.
+3. Open Downloader, type the link above and press **Go**.
+4. Press **Install**, then **Open**.
+5. Your country is normally at the top already. Press **OK** and TV starts.
 
-Run the parser tests:
+To keep it on your home row: hold the Home button, pick **Apps**, find Aerial TV, press the menu button (three lines) and choose **Move to front**.
 
-```bash
-./gradlew testReleaseUnitTest
-```
+</details>
 
-Try it on a connected TV box or phone with USB or network debugging switched on:
+<details>
+<summary><b>Android TV or Google TV box</b> (Mi Box, Chromecast, TCL, Sony and most cheap TV boxes)</summary>
+<br>
 
-```bash
-adb install -r app/build/outputs/apk/release/app-release.apk
-```
+1. Open the **Play Store** on the TV and install **Downloader** by AFTVnews. It's free.
+2. Allow it to install apps:
+   * **Android TV:** Settings → Device Preferences → Security & restrictions → Unknown sources → switch on **Downloader**.
+   * **Google TV:** Settings → System → About, click **Android TV OS build** 7 times. Then Settings → Apps → Security & restrictions → Unknown sources → switch on **Downloader**.
+3. Open Downloader, type the link above and press **Go**.
+4. Press **Install**, then **Open**.
+5. Pick your country and press **OK**.
 
-## Releasing a new version
+Aerial TV now has its own tile on the TV's home screen.
 
-1. In `app/build.gradle.kts`, raise `versionCode` by 1 and set `versionName` (for example `1.1`). Android refuses an update whose `versionCode` isn't higher.
-2. Build with `./gradlew assembleRelease`.
-3. Copy the APK to `release/Aerial TV 1.1.apk`.
-4. Publish it on GitHub:
+</details>
 
-   ```bash
-   gh release create v1.1 "release/Aerial TV 1.1.apk" --title "Aerial TV 1.1" --notes "What changed"
-   ```
+<details>
+<summary><b>Android phone or tablet</b></summary>
+<br>
 
-5. Upload the same file to your website's download link.
+1. Tap the **Download free** button at the top of this page.
+2. Open the file when it finishes. If your phone asks, allow Chrome to install apps, then go back.
+3. Tap **Install**, then **Open**.
 
-## Signing key (back this up)
+</details>
 
-`signing/aerialtv-release.jks` and `keystore.properties` sign every release. Copy both somewhere safe (a USB stick and a password manager). If they're lost, people can't update the app and have to uninstall and reinstall. Neither file goes in git.
+<details>
+<summary><b>No internet on the TV box? Use a USB stick</b></summary>
+<br>
 
-## Changing things
+1. Download the app on a computer and copy it to a USB stick.
+2. Plug the stick into the TV box.
+3. Install a file manager from the Play Store (X-plore File Manager works), open the USB stick and click the file.
+4. If the TV asks, allow the file manager to install apps, then press **Install**.
 
-* App name: `app_name` in `app/src/main/res/values/strings.xml`, plus the banner text in `tools/icons.ps1`. Rerun the script after changing it:
+</details>
 
-  ```bash
-  powershell -ExecutionPolicy Bypass -File tools/icons.ps1 -Res app/src/main/res
-  ```
+<br>
 
-* Package id: `applicationId` in `app/build.gradle.kts` (currently `tv.aerialtv.app`). Settle this before the first public release. It can't change later without breaking updates.
-* Your own playlist mirror: set `MIRROR_URL` in `app/build.gradle.kts`, for example `https://aerialtv.tv/lists/%s.m3u`. It's tried before the iptv-org hosts. See "Playlist mirror" below for the job that fills it.
-* Country list: `app/src/main/assets/countries.json`.
+<p align="center">
+  <img src="docs/images/remote.svg" alt="Remote guide. Up or down changes channel, OK shows all channels, right shows what's on, back twice closes, numbers jump to a channel. On a phone, swipe to change channel and tap for the list." width="100%">
+</p>
 
-## Playlist mirror
+## Something not working?
 
-A lot of links in the iptv-org lists are dead at any given moment. On 17 October 2026 Pakistan had 34 working streams out of 103, and each dead one costs the viewer up to 12 seconds of black screen while the app skips it. `server/mirror.mjs` does that skipping on a server instead. It downloads each country playlist from GitHub raw, tries every stream the way the app would (same user agent and referrer, 8 second limit, and for HLS it follows the playlist down to a real video segment), then writes a cleaned copy without the dead links.
+**"Channel is off air right now."** That free stream is down today. Aerial TV jumps to the next channel by itself, so just wait a few seconds.
 
-Streams that answer 401, 403 or 451 are kept, tagged `[Geo-blocked]` and moved to the end, because the server may simply be in the wrong country. Streams iptv-org already marks as geo-blocked are kept too, unless their host doesn't exist or returns 404. The file format doesn't change, so the app reads these lists with its normal parser. Serving them from your own domain also gets round ISPs that block github.io.
+**"Can't reach the internet."** Check the WiFi or cable on the TV box, then press **Try again**.
 
-Run it locally with Node 18 or newer. There's nothing to install.
+**A channel plays at home but not when you travel.** Some broadcasters only allow viewers inside their own country. A Pakistani channel might play in Lahore and stay dark in Dubai. That's their rule, not a fault in the app.
 
-```bash
-node server/mirror.mjs pk ae
-```
+**Wrong country?** Press **OK** to open the channel list and use **Change country** at the top.
 
-That writes `server/out/pk.m3u`, `server/out/ae.m3u` and `server/out/status.json` (counts per country plus the time of the run), and prints a line per country such as `pk: 34 alive, 3 geo-blocked kept, 66 dead (of 103)`. Leave the codes off to do every country in `countries.json`. Options: `--out <folder>`, `--concurrency 40` (streams checked at once), `--per-host 4` (so one server isn't flooded and wrongly marked dead), `--timeout 8000` (milliseconds per stream) and `-v` to print the verdict for every stream.
+**New version out?** Install it the same way, over the old one. Your favourites and last channel stay.
 
-A country file is only replaced when the run finds at least one working stream, and it's swapped in whole, so the web server never hands out half a list. If GitHub can't be reached, yesterday's file stays.
+## Where do the channels come from?
 
-### Running it every 6 hours
+Aerial TV plays free public streams listed by the open [iptv-org](https://github.com/iptv-org/iptv) project. We don't host any video ourselves.
 
-Any small Linux VPS with Node will do. The job waits on the network, not the CPU, so the cheapest plan is enough. Pick a location close to most of your viewers if you can: the checks run from wherever the server sits, and a channel that only plays inside Pakistan will look blocked from Europe.
+<br>
 
-1. Copy the project to the server, for example to `/opt/aerialtv`. It only needs `server/` and `app/src/main/assets/countries.json`, at those same paths.
-2. Install Node (`sudo apt install nodejs` on Ubuntu 24.04 gives Node 18) and a web server such as nginx.
-3. Serve a folder like `/var/www/aerialtv/lists` at `https://aerialtv.tv/lists/` over HTTPS (certbot sets up the certificate).
-4. Add the job with `crontab -e`:
-
-   ```
-   0 */6 * * * cd /opt/aerialtv && /usr/bin/node server/mirror.mjs --out /var/www/aerialtv/lists >> $HOME/aerialtv-mirror.log 2>&1
-   ```
-
-Run it once by hand first and read the log. A full run of every country takes much longer than the local test (pk and ae together took about 2 minutes on Faizan's PC, mostly waiting for dead links to time out), which is fine for a job that runs 4 times a day. The app keeps a list for 6 hours, so the two stay roughly in step.
-
-If the website itself is on shared hosting without Node, run the job on the VPS and copy the files over after each run, for example by adding `&& rsync -a /var/www/aerialtv/lists/ user@yourhost:public_html/lists/` to the cron line.
-
-### Pointing the app at it
-
-In `app/build.gradle.kts`, replace the empty value:
-
-```kotlin
-buildConfigField("String", "MIRROR_URL", "\"https://aerialtv.tv/lists/%s.m3u\"")
-```
-
-The app swaps `%s` for the country code, so Pakistan loads `https://aerialtv.tv/lists/pk.m3u`. Open that address in a browser to check it works, then build and release a new version. The mirror is asked first and gets a 2.5 second head start before the iptv-org hosts are tried. If the mirror is down or missing a country, the app falls back to iptv-org on its own, so nothing breaks.
+<p align="center">
+  <sub>Works on Android 5.0 or newer. The app is about 2 MB.<br>
+  Building the app yourself? See <a href="BUILDING.md">BUILDING.md</a>.</sub>
+</p>
