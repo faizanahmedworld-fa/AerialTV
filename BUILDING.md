@@ -72,7 +72,7 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 
 1. In `app/build.gradle.kts`, raise `versionCode` by 1 and set `versionName` (for example `1.1`). Android refuses an update whose `versionCode` isn't higher.
 2. Build with `./gradlew assembleRelease`.
-3. Copy the APK to `release/AerialTV.apk`. Keep that exact name, because the download button on the main page points at it.
+3. Copy the APK to `release/AerialTV.apk` and commit it. That one file is tracked in git (the rest of the folder is ignored), so the backup link on the main page always serves the current version. Keep the exact name, because the download button points at it too.
 4. Publish it on GitHub:
 
    ```bash

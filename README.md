@@ -43,7 +43,7 @@ To keep it on your home row: hold the Home button, pick **Apps**, find Aerial TV
 </details>
 
 <details>
-<summary><b>Android TV or Google TV box</b> (Mi Box, Chromecast, TCL, Sony and most cheap TV boxes)</summary>
+<summary><b>Google TV or Android TV</b> (Sony, TCL, Hisense, Philips and Sharp smart TVs, Chromecast, Mi Box and most TV boxes)</summary>
 <br>
 
 1. Open the **Play Store** on the TV and install **Downloader** by AFTVnews. It's free.
@@ -80,7 +80,18 @@ Aerial TV now has its own tile on the TV's home screen.
 </details>
 
 <details>
+<summary><b>Samsung or LG smart TV</b></summary>
+<br>
+
+Samsung (Tizen) and LG (webOS) TVs can't install Android apps, so there's nothing to download for the TV itself. The usual fix is a Fire TV Stick or a Google TV box in the HDMI port, which costs about the same as one month of a paid TV plan. Then follow the steps above for that device.
+
+If the TV has a Google TV or Android TV badge on the box (some Hisense, Philips and all Sony sets do), it's Android inside and the Google TV steps above work as they are.
+
+</details>
+
+<details>
 <summary><b>iPhone, iPad or Apple TV</b></summary>
+
 <br>
 
 Not yet. Apple only allows apps from its App Store, and the App Store doesn't take players that come with channels built in. A web version you can open in Safari and send to an Apple TV with AirPlay is the plan. The full story is in [docs/Apple.md](docs/Apple.md).
@@ -97,7 +108,14 @@ Not yet. Apple only allows apps from its App Store, and the App Store doesn't ta
 
 **"Channel is off air right now."** That free stream is down today. Aerial TV jumps to the next channel by itself, so just wait a few seconds.
 
-**"Can't reach the internet."** Check the WiFi or cable on the TV box, then press **Try again**.
+**The download link won't open on the TV.** Some internet providers block parts of GitHub. This link is the same file from a different address:
+
+```
+https://raw.githubusercontent.com/faizanahmedworld-fa/AerialTV/main/release/AerialTV.apk
+```
+
+**"Can't reach the internet."**
+ Check the WiFi or cable on the TV box, then press **Try again**.
 
 **A channel plays at home but not when you travel.** Some broadcasters only allow viewers inside their own country. A Pakistani channel might play in Lahore and stay dark in Dubai. That's their rule, not a fault in the app.
 

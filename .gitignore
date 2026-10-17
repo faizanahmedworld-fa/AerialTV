@@ -6,7 +6,8 @@ local.properties
 *.iml
 signing/
 keystore.properties
-release/
+release/*
 .kotlin/
 *.apk
 server/out/
+!release/AerialTV.apk
