@@ -1,4 +1,4 @@
-# Netlify serves the web folder as is: no build step, just index.html and countries.json.
+# Netlify serves the web folder as is: no build step. index.html is the landing page, watch/ is the player.
 [build]
   publish = "web"
   command = ""

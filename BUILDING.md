@@ -28,7 +28,9 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 | `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists |
 | `tools/icons.ps1` | Draws the launcher icons and the Android TV banner |
 | `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL`, plus browser safe copies for the web player |
-| `web/index.html` | The web player for iPhone, iPad (and AirPlay to Apple TV), Chrome and desktop browsers. One file, no build step |
+| `web/index.html` | The landing page people find through Google: what the app is, install steps, a link per country, structured data. Plain HTML, no build step |
+| `web/sitemap.xml`, `web/robots.txt`, `web/404.html`, `web/og.png`, `web/icon.png` | Search and sharing files for the landing page. The site address `https://faizanahmedworld-fa.github.io/AerialTV/` is written into the canonical links, Open Graph tags, JSON-LD and sitemap, so search and replace it when the site moves to its own domain |
+| `web/watch/index.html` | The web player for iPhone, iPad (and AirPlay to Apple TV), Chrome and desktop browsers. One file, no build step |
 | `web/countries.json` | Copy of `app/src/main/assets/countries.json` for the web player. Keep the two the same |
 | `docs/Apple.md` | Why there's no iPhone or Apple TV version, and the web player route that gets round it |
 
@@ -101,7 +103,7 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 
 ## Web player
 
-`web/index.html` is Aerial TV for browsers: iPhone and iPad in Safari (and from there to an Apple TV with AirPlay), Chrome on Android, and any laptop. Why it exists and what it can't do is in [docs/Apple.md](docs/Apple.md). It's a single HTML file with the CSS and JavaScript inside, no framework and no build step. Safari plays HLS natively; every other browser loads [hls.js](https://github.com/video-dev/hls.js) from jsDelivr.
+`web/watch/index.html` is Aerial TV for browsers: iPhone and iPad in Safari (and from there to an Apple TV with AirPlay), Chrome on Android, and any laptop. Why it exists and what it can't do is in [docs/Apple.md](docs/Apple.md). It's a single HTML file with the CSS and JavaScript inside, no framework and no build step. Safari plays HLS natively; every other browser loads [hls.js](https://github.com/video-dev/hls.js) from jsDelivr.
 
 What it does: shows the country picker on first visit and remembers the choice and the last channel in `localStorage`, numbers and groups the channels the way the app does (same merging of SD, HD and backup feeds), changes channel with swipe up or down, the arrow keys or Page Up and Page Down, opens the list on a tap, Enter or the left arrow, jumps to a number with the digit keys, and skips a stream that shows no picture within 12 seconds, trying the channel's other feeds first. The AirPlay button appears when Safari finds a receiver on the network.
 
@@ -111,7 +113,7 @@ Try it locally with any static server, for example:
 python -m http.server 8791 --directory web
 ```
 
-Then open `http://localhost:8791/`. Add `?country=pk` to the address to force a country.
+Then open `http://localhost:8791/watch/`. Add `?country=pk` to the address to force a country.
 
 It's live at `https://faizanahmedworld-fa.github.io/AerialTV/`. The "Web player" job in `.github/workflows/pages.yml` publishes the `web` folder to GitHub Pages on every push to `main` that touches it, and fails on purpose if `web/countries.json` has drifted from the app's copy. Some internet providers block github.io, so the domain is still the end goal. To put it on the domain, copy the `web` folder to the web root (`index.html` and `countries.json`). The two settings at the top of `index.html`:
 

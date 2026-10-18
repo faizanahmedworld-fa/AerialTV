@@ -11,7 +11,7 @@
 // app still has them for viewers inside the right country. Plain Node 18+, no packages.
 //
 // Each country also gets a <code>.web.m3u with only the streams a browser can play (https, HLS,
-// no custom user agent or referrer). That one feeds the web player in web/index.html.
+// no custom user agent or referrer). That one feeds the web player in web/watch/index.html.
 
 import fs from 'node:fs'
 import path from 'node:path'

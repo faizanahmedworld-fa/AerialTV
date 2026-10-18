@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://faizanahmedworld-fa.github.io/AerialTV/sitemap.xml

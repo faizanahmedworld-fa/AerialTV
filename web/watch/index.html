@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070D1F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aerial TV">
+<title>Watch Aerial TV in your browser: free live TV on iPhone, iPad, Mac and PC</title>
+<meta name="description" content="Free live TV channels in Safari or Chrome with nothing to install. Pick your country once, swipe to change channel and send it to an Apple TV with AirPlay.">
+<link rel="canonical" href="https://faizanahmedworld-fa.github.io/AerialTV/watch/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aerial TV">
+<meta property="og:title" content="Watch Aerial TV in your browser">
+<meta property="og:description" content="Free live TV channels from 189 countries. Works in Safari and Chrome, with AirPlay to an Apple TV.">
+<meta property="og:url" content="https://faizanahmedworld-fa.github.io/AerialTV/watch/">
+<meta property="og:image" content="https://faizanahmedworld-fa.github.io/AerialTV/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="../icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230E1A3A'/%3E%3Cpath d='M18 44 32 16l14 28h-7l-7-15-7 15z' fill='%23FFB020'/%3E%3C/svg%3E">
+
+<script>
+// ============================================================================================
+// Settings. Change these two lines when the mirror is live.
+//
+// PLAYLIST_URLS: where the country playlists come from, tried in order until one answers.
+// %s becomes the country code (pk, ae...). The defaults are the public iptv-org list from
+// GitHub raw, then the same list through jsDelivr, then iptv-org's own GitHub Pages copy, the
+// same three sources the Android app uses, because some internet providers block one of them.
+// Once server/mirror.mjs runs on your domain, put its web lists first, for example
+// 'https://aerialtv.tv/lists/%s.web.m3u'. Whatever the source, the page keeps only streams a
+// browser can play (https, HLS, no custom user agent or referrer). On the mirror's web list that
+// filter changes nothing. On the raw iptv-org list it does the mirror's job client side, minus
+// the health check, so dead streams are skipped at 12 seconds each like in the Android app.
+//
+// COUNTRIES_URL: the country list. countries.json sits one folder up, in web/ (a copy of
+// app/src/main/assets/countries.json). If it isn't there, the repo's copy on jsDelivr is used.
+// ============================================================================================
+const PLAYLIST_URLS = [
+  'https://raw.githubusercontent.com/iptv-org/iptv/gh-pages/countries/%s.m3u',
+  'https://cdn.jsdelivr.net/gh/iptv-org/iptv@gh-pages/countries/%s.m3u',
+  'https://iptv-org.github.io/iptv/countries/%s.m3u',
+]
+const COUNTRIES_URL = '../countries.json'
+const COUNTRIES_FALLBACK_URL = 'https://cdn.jsdelivr.net/gh/faizanahmedworld-fa/AerialTV@main/web/countries.json'
+const HLS_JS_URL = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js'
+const START_TIMEOUT_MS = 12000  // give a stream this long to show a picture before moving on
+const MAX_SKIPS = 12            // stop zapping after this many dead channels in a row
+</script>
+
+<style>
+  :root {
+    --bg: #070D1F;
+    --navy: #0E1A3A;
+    --panel: rgba(14, 26, 58, 0.96);
+    --line: rgba(184, 194, 220, 0.14);
+    --text: #FFFFFF;
+    --muted: #B8C2DC;
+    --dim: #8A97BA;
+    --amber: #FFB020;
+    --blue: #2F6BFF;
+    --green: #3DDC84;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.35;
+    user-select: none;
+    -webkit-user-select: none;
+    overscroll-behavior: none;
+  }
+  button { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+
+  /* ---------------------------------------------------------------- stage */
+  #stage { position: fixed; inset: 0; background: #000; }
+  #video {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    background: #000;
+    display: block;
+  }
+  /* The tap layer sits above the video so a touch opens the guide instead of toggling play. */
+  #tap { position: absolute; inset: 0; cursor: pointer; touch-action: none; }
+
+  /* ---------------------------------------------------------------- banner */
+  #banner {
+    position: absolute;
+    left: calc(16px + var(--safe-left)); right: calc(16px + var(--safe-right));
+    bottom: calc(18px + var(--safe-bottom));
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    background: linear-gradient(180deg, rgba(14, 26, 58, 0.92), rgba(7, 13, 31, 0.96));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .25s, transform .25s;
+    pointer-events: none;
+    max-width: 640px;
+  }
+  #banner.show { opacity: 1; transform: none; }
+  #banner .num {
+    font-size: 28px; font-weight: 700; color: var(--amber);
+    min-width: 54px; text-align: center; font-variant-numeric: tabular-nums;
+  }
+  #banner .logo {
+    width: 56px; height: 42px; object-fit: contain; border-radius: 6px;
+    background: rgba(255,255,255,0.06); flex: none;
+  }
+  #banner .logo.none { display: none; }
+  #banner .name { font-size: 20px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #banner .sub { color: var(--muted); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #banner .text { min-width: 0; flex: 1; }
+
+  /* ---------------------------------------------------------------- top bar with buttons */
+  #topbar {
+    position: absolute;
+    top: calc(12px + var(--safe-top)); right: calc(12px + var(--safe-right));
+    display: flex; gap: 8px;
+    opacity: 0; transition: opacity .25s;
+  }
+  #topbar.show { opacity: 1; }
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(7, 13, 31, 0.78);
+    display: grid; place-items: center;
+    cursor: pointer; padding: 0;
+    backdrop-filter: blur(6px);
+  }
+  .icon-btn:hover, .icon-btn:focus-visible { border-color: var(--amber); outline: none; }
+  .icon-btn svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------------------------------------------------------------- centre messages */
+  #centre {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    pointer-events: none;
+    text-align: center; padding: 24px;
+  }
+  #centre .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 28px;
+    max-width: 420px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  }
+  #centre .card h2 { margin: 0 0 6px; font-size: 20px; font-weight: 600; }
+  #centre .card p { margin: 0; color: var(--muted); }
+  #centre .spin {
+    width: 34px; height: 34px; margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.12);
+    border-top-color: var(--amber);
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #centre .big {
+    pointer-events: auto;
+    cursor: pointer;
+    background: var(--amber); color: #1a1200;
+    border: 0; border-radius: 999px;
+    padding: 16px 32px; font-size: 20px; font-weight: 700;
+    box-shadow: 0 10px 30px rgba(255,176,32,.35);
+  }
+  #centre .big:active { transform: scale(.98); }
+  .btn {
+    pointer-events: auto; cursor: pointer;
+    background: var(--blue); color: #fff;
+    border: 0; border-radius: 10px;
+    padding: 10px 18px; font-weight: 600; margin-top: 14px;
+  }
+
+  /* ---------------------------------------------------------------- digits */
+  #digits {
+    position: absolute; top: calc(16px + var(--safe-top)); left: calc(16px + var(--safe-left));
+    font-size: 44px; font-weight: 700; color: var(--amber);
+    background: rgba(7,13,31,.8); border-radius: 12px; padding: 4px 16px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------------------------------------------------------------- guide (channel list) */
+  #guide, #countries {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s;
+  }
+  #guide.open, #countries.open { opacity: 1; pointer-events: auto; }
+  .panel {
+    width: min(420px, 100%);
+    height: 100%;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    display: flex; flex-direction: column;
+    transform: translateX(-24px);
+    transition: transform .2s;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+    padding-left: var(--safe-left);
+  }
+  .open .panel { transform: none; }
+  .panel-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .panel-head h1 { margin: 0; font-size: 18px; font-weight: 700; flex: 1; display: flex; align-items: center; gap: 8px; }
+  .panel-head h1 .flag { font-size: 22px; }
+  .panel-head .count { color: var(--dim); font-size: 13px; font-weight: 400; }
+  .text-btn {
+    background: transparent; border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 12px; cursor: pointer; color: var(--muted); font-size: 14px;
+  }
+  .text-btn:hover, .text-btn:focus-visible { border-color: var(--amber); color: #fff; outline: none; }
+  .search {
+    margin: 10px 16px 6px;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0 12px;
+  }
+  .search input {
+    flex: 1; background: transparent; border: 0; color: #fff; font: inherit;
+    padding: 10px 0; outline: none; min-width: 0;
+  }
+  .search input::placeholder { color: var(--dim); }
+  .list { flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 6px 8px 16px; }
+  .group {
+    position: sticky; top: 0; z-index: 1;
+    background: var(--panel);
+    color: var(--dim); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 12px 10px 6px;
+  }
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; text-align: left;
+    padding: 9px 10px; border: 0; border-radius: 10px;
+    background: transparent; cursor: pointer;
+  }
+  .row:hover, .row:focus-visible { background: rgba(255,255,255,.07); outline: none; }
+  .row.current { background: rgba(255,176,32,.14); box-shadow: inset 3px 0 0 var(--amber); }
+  .row .num { width: 36px; color: var(--amber); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; flex: none; }
+  .row .logo { width: 44px; height: 32px; object-fit: contain; border-radius: 5px; background: rgba(255,255,255,.06); flex: none; }
+  .row .logo.none { visibility: hidden; }
+  .row .name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
+  .row .flag { font-size: 24px; width: 36px; text-align: center; flex: none; }
+  .row .tag { color: var(--dim); font-size: 12px; flex: none; }
+  .empty { color: var(--muted); padding: 24px 16px; line-height: 1.5; }
+  .empty a { color: var(--amber); }
+
+  /* ---------------------------------------------------------------- country picker */
+  #countries { z-index: 2; }
+  #countries .panel { margin: 0 auto; border-right: 0; border-left: 0; }
+  #countries.full .panel { width: min(460px, 100%); }
+  .intro { padding: 18px 16px 4px; }
+  .intro h1 { margin: 0 0 4px; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+  .intro h1 svg { width: 30px; height: 30px; }
+  .intro p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* ---------------------------------------------------------------- help footer */
+  .hint {
+    padding: 10px 16px; border-top: 1px solid var(--line);
+    color: var(--dim); font-size: 12px; line-height: 1.5;
+  }
+  .hint b { color: var(--muted); font-weight: 600; }
+
+  /* On a phone the guide takes the whole width and slides from the bottom. */
+  @media (max-width: 600px) {
+    .panel { width: 100%; transform: translateY(24px); border-right: 0; }
+    #banner { max-width: none; padding: 10px 12px; gap: 10px; }
+    #banner .num { font-size: 22px; min-width: 40px; }
+    #banner .name { font-size: 17px; }
+    .hint .kbd { display: none; }
+  }
+  @media (min-width: 601px) { .hint .touch { display: none; } }
+  @media (hover: none) { #topbar { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" autoplay></video>
+  <div id="tap" aria-label="Open channel list"></div>
+
+  <div id="topbar" class="show">
+    <button class="icon-btn" id="btn-guide" title="Channels (Enter)" aria-label="Channels">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-airplay" title="AirPlay" aria-label="AirPlay" hidden>
+      <svg viewBox="0 0 24 24"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/><path d="M12 15l5 6H7l5-6z"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-mute" title="Sound" aria-label="Sound">
+      <svg viewBox="0 0 24 24" id="ico-sound"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-full" title="Full screen (F)" aria-label="Full screen">
+      <svg viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+    </button>
+  </div>
+
+  <div id="banner" aria-live="polite">
+    <div class="num" id="b-num"></div>
+    <img class="logo none" id="b-logo" alt="">
+    <div class="text">
+      <div class="name" id="b-name"></div>
+      <div class="sub" id="b-sub"></div>
+    </div>
+  </div>
+
+  <div id="digits" hidden></div>
+  <div id="centre"></div>
+</div>
+
+<!-- Channel list -->
+<div id="guide" role="dialog" aria-label="Channels">
+  <div class="panel">
+    <div class="panel-head">
+      <h1><span class="flag" id="g-flag"></span><span id="g-country">Channels</span> <span class="count" id="g-count"></span></h1>
+      <button class="text-btn" id="btn-country">Change country</button>
+      <button class="icon-btn" id="btn-close" aria-label="Close" style="width:38px;height:38px">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8A97BA" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="g-search" type="search" placeholder="Search channels or type a number" autocomplete="off">
+    </div>
+    <div class="list" id="g-list"></div>
+    <div class="hint">
+      <span class="kbd"><b>↑ ↓</b> change channel &nbsp; <b>Enter</b> list &nbsp; <b>0 to 9</b> jump to a number &nbsp; <b>F</b> full screen &nbsp; <b>Esc</b> close</span>
+      <span class="touch"><b>Swipe up or down</b> to change channel, <b>tap</b> the picture for this list. On an iPhone, the AirPlay button sends it to your Apple TV.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Country picker -->
+<div id="countries" role="dialog" aria-label="Choose your country" class="full">
+  <div class="panel">
+    <div class="intro">
+      <h1><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0E1A3A"/><path d="M18 44 32 16l14 28h-7l-7-15-7 15z" fill="#FFB020"/></svg>Aerial TV</h1>
+      <p>Free live TV, nothing to install. Pick your country once.</p>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8A97BA" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="c-search" type="search" placeholder="Search countries" autocomplete="off">
+    </div>
+    <div class="list" id="c-list"></div>
+    <div class="panel-head" id="c-foot" hidden style="border-top:1px solid var(--line);border-bottom:0">
+      <span style="flex:1;color:var(--dim);font-size:13px">Channels are the free public streams listed by iptv-org.</span>
+      <button class="text-btn" id="btn-c-close">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict'
+
+// ============================================================================================
+// Playlist parsing. Same rules as app/src/main/java/tv/aerialtv/app/M3uParser.kt: entries that
+// share a tvg-id (SD, HD and backup feeds of the same channel) become one channel with several
+// streams, channels are numbered in a TV like category order, and 720p streams are tried first.
+// ============================================================================================
+const CATEGORY_ORDER = [
+  'general', 'news', 'entertainment', 'movies', 'series', 'sports', 'kids', 'animation',
+  'family', 'music', 'documentary', 'comedy', 'lifestyle', 'cooking', 'travel', 'outdoor',
+  'culture', 'education', 'science', 'business', 'religious', 'legislative', 'classic',
+  'auto', 'weather', 'shop', 'public', 'relax', 'interactive', 'undefined',
+]
+const categoryRank = (c) => { const i = CATEGORY_ORDER.indexOf(c); return i < 0 ? CATEGORY_ORDER.length - 1 : i }
+const categoryLabel = (c) => c === 'undefined' ? 'Other' : c.charAt(0).toUpperCase() + c.slice(1)
+
+/** Splits an EXTINF line at the first comma that is outside quotes. */
+function splitInfo(line) {
+  let q = false
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (ch === '"') q = !q
+    else if (ch === ',' && !q) return [line.slice(0, i), line.slice(i + 1)]
+  }
+  return [line, '']
+}
+
+/** True when a browser can play the stream. Same test as browserSafe() in server/mirror.mjs. */
+function browserSafe(s) {
+  return /^https:\/\//i.test(s.url) && /\.m3u8(\?|#|$)/i.test(s.url) && !s.userAgent && !s.referrer
+}
+
+function parsePlaylist(text) {
+  const byKey = new Map()
+  let info = null, ua = null, ref = null
+  for (const raw of text.replace(/^﻿/, '').split(/\r?\n/)) {
+    const line = raw.trim()
+    if (!line) continue
+    if (line.startsWith('#EXTINF')) { info = line; ua = null; ref = null }
+    else if (line.startsWith('#EXTVLCOPT:http-user-agent=')) ua = line.slice(line.indexOf('=') + 1)
+    else if (line.startsWith('#EXTVLCOPT:http-referrer=')) ref = line.slice(line.indexOf('=') + 1)
+    else if (line.startsWith('#')) continue
+    else if (info) { addEntry(byKey, info, line, ua, ref); info = null }
+  }
+
+  const qualityScore = (q) => q === 0 ? 150 : Math.abs(q - 720)
+  const channels = []
+  for (const b of byKey.values()) {
+    // Streams a browser can't play are dropped here, so a channel with only http links vanishes.
+    const streams = b.streams.filter(browserSafe)
+    if (!streams.length) continue
+    streams.sort((a, c) => (a.geoBlocked - c.geoBlocked) || (qualityScore(a.quality) - qualityScore(c.quality)))
+    const categories = [...b.categories].sort((a, c) => categoryRank(a) - categoryRank(c))
+    channels.push({ key: b.key, name: b.name, logo: b.logo, categories, streams })
+  }
+  channels.sort((a, c) => (categoryRank(a.categories[0]) - categoryRank(c.categories[0]))
+    || a.name.toLowerCase().localeCompare(c.name.toLowerCase()))
+  channels.forEach((c, i) => { c.number = i + 1 })
+  return channels
+}
+
+function addEntry(byKey, header, url, ua, ref) {
+  const [attrPart, namePart] = splitInfo(header)
+  const attrs = {}
+  for (const m of attrPart.matchAll(/([A-Za-z0-9-]+)="([^"]*)"/g)) attrs[m[1]] = m[2]
+
+  const rawName = namePart.trim()
+  const quality = Number(rawName.match(/\((\d{3,4})p\)/)?.[1] || 0)
+  const geoBlocked = /geo-blocked/i.test(rawName)
+  const name = rawName.replace(/\(\d{3,4}p\)/g, '').replace(/\[[^\]]*]/g, '').replace(/\s+/g, ' ').trim() || rawName
+
+  const id = (attrs['tvg-id'] || '').split('@')[0].trim().toLowerCase()
+  const key = id || name.toLowerCase()
+
+  let b = byKey.get(key)
+  if (!b) { b = { key, name, logo: null, categories: new Set(), streams: [] }; byKey.set(key, b) }
+  if (name.length < b.name.length) b.name = name
+  if (!b.logo && attrs['tvg-logo']) b.logo = attrs['tvg-logo']
+
+  const groups = (attrs['group-title'] || '').split(';').map((g) => g.trim().toLowerCase()).filter(Boolean)
+  for (const g of (groups.length ? groups : ['undefined'])) b.categories.add(g)
+
+  if (!b.streams.some((s) => s.url === url)) {
+    b.streams.push({ url, userAgent: ua || attrs['http-user-agent'] || null, referrer: ref || attrs['http-referrer'] || null, quality, geoBlocked })
+  }
+}
+
+// ============================================================================================
+// State
+// ============================================================================================
+const $ = (id) => document.getElementById(id)
+const video = $('video')
+const store = {
+  get(k) { try { return localStorage.getItem(k) } catch { return null } },
+  set(k, v) { try { localStorage.setItem(k, v) } catch {} },
+}
+
+let countries = []
+let country = null        // { code, name, flag }
+let channels = []
+let current = -1
+let direction = 1
+let attemptIndex = 0
+let skippedInRow = 0
+let startTimer = 0
+let hls = null
+let hlsLoading = null
+let needsTap = false
+let wasReady = false      // the current stream has shown a picture at least once
+let digits = ''
+let digitTimer = 0
+let bannerTimer = 0
+let topbarTimer = 0
+let loadToken = 0
+
+const nativeHls = video.canPlayType('application/vnd.apple.mpegurl') !== ''
+
+// ============================================================================================
+// Centre messages
+// ============================================================================================
+function centre(html) { $('centre').innerHTML = html || '' }
+function showLoading(text) { centre(`<div class="card"><div class="spin"></div><p>${esc(text)}</p></div>`) }
+function showMessage(title, text, button) {
+  centre(`<div class="card"><h2>${esc(title)}</h2><p>${esc(text || '')}</p>${button ? `<button class="btn" id="centre-btn">${esc(button.label)}</button>` : ''}</div>`)
+  if (button) $('centre-btn').onclick = button.onClick
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) }
+
+// ============================================================================================
+// Countries
+// ============================================================================================
+async function loadCountries() {
+  for (const url of [COUNTRIES_URL, COUNTRIES_FALLBACK_URL]) {
+    try {
+      const r = await fetch(url, { cache: 'force-cache' })
+      if (r.ok) { countries = await r.json(); return }
+    } catch {}
+  }
+  throw new Error('country list')
+}
+
+/** The country the browser hints at, so it sits at the top of the picker on first run. */
+function guessCountry() {
+  const langs = navigator.languages || [navigator.language || '']
+  for (const l of langs) {
+    const region = l.split(/[-_]/)[1]
+    if (region && region.length === 2) {
+      const hit = countries.find((c) => c.code === region.toLowerCase())
+      if (hit) return hit
+    }
+  }
+  return null
+}
+
+function renderCountries(filter = '') {
+  const list = $('c-list')
+  const q = filter.trim().toLowerCase()
+  const guess = q ? null : guessCountry()
+  const items = countries.filter((c) => !q || c.name.toLowerCase().includes(q) || c.code === q)
+  if (guess) { const i = items.indexOf(guess); if (i > 0) { items.splice(i, 1); items.unshift(guess) } }
+  list.innerHTML = ''
+  if (!items.length) { list.innerHTML = '<div class="empty">No country matches that.</div>'; return }
+  const frag = document.createDocumentFragment()
+  items.forEach((c, i) => {
+    const b = document.createElement('button')
+    b.className = 'row' + (country && c.code === country.code ? ' current' : '')
+    b.innerHTML = `<span class="flag">${esc(c.flag || '')}</span><span class="name">${esc(c.name)}</span>${guess === c && i === 0 ? '<span class="tag">Suggested</span>' : ''}`
+    b.onclick = () => chooseCountry(c)
+    frag.appendChild(b)
+  })
+  list.appendChild(frag)
+}
+
+function openCountries() {
+  $('c-foot').hidden = !country
+  $('c-search').value = ''
+  renderCountries()
+  $('countries').classList.add('open')
+  if (matchMedia('(hover: hover)').matches) setTimeout(() => $('c-search').focus(), 50)
+}
+function closeCountries() { $('countries').classList.remove('open') }
+
+function chooseCountry(c) {
+  closeCountries()
+  closeGuide()
+  if (country && country.code === c.code && channels.length) return
+  country = c
+  store.set('aerialtv.country', c.code)
+  loadCountry()
+}
+
+// ============================================================================================
+// Playlist loading
+// ============================================================================================
+async function loadCountry() {
+  const token = ++loadToken
+  stopPlayback()
+  channels = []
+  current = -1
+  renderGuideHead()
+  renderGuide()
+  showLoading(`Loading ${country.name} channels`)
+
+  let text
+  for (const url of PLAYLIST_URLS) {
+    try {
+      const r = await fetch(url.replace('%s', country.code), { cache: 'no-cache' })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      text = await r.text()
+      break
+    } catch (err) {}
+    if (token !== loadToken) return
+  }
+  if (text === undefined) {
+    if (token !== loadToken) return
+    showMessage("Can't reach the channel list", 'Check your internet connection, then try again.', { label: 'Try again', onClick: loadCountry })
+    return
+  }
+  if (token !== loadToken) return
+
+  channels = parsePlaylist(text)
+  renderGuideHead()
+  renderGuide()
+  if (!channels.length) {
+    showMessage(`No ${country.name} channels play in a browser yet`, 'The free streams for this country need the Android app. Pick another country, or install Aerial TV on an Android TV, Fire TV Stick or phone.', { label: 'Change country', onClick: openCountries })
+    return
+  }
+
+  const saved = store.get(`aerialtv.channel.${country.code}`)
+  let start = channels.findIndex((c) => c.key === saved)
+  if (start < 0) start = 0
+  skippedInRow = 0
+  direction = 1
+  tune(start)
+}
+
+// ============================================================================================
+// Playback, with the Android app's auto skip: every stream of a channel gets 12 seconds to
+// show a picture, then the next channel in the direction of travel is tried.
+// ============================================================================================
+const wrap = (i) => ((i % channels.length) + channels.length) % channels.length
+
+function tune(index) {
+  if (!channels.length) return
+  current = wrap(index)
+  attemptIndex = 0
+  store.set(`aerialtv.channel.${country.code}`, channels[current].key)
+  showBanner(channels[current])
+  renderGuide()
+  playAttempt()
+}
+
+function zap(delta) {
+  if (!channels.length) return
+  direction = delta > 0 ? 1 : -1
+  skippedInRow = 0
+  tune(current + delta)
+}
+
+function stopPlayback() {
+  clearTimeout(startTimer)
+  if (hls) { hls.destroy(); hls = null }
+  video.removeAttribute('src')
+  video.load()
+}
+
+function playAttempt() {
+  const ch = channels[current]
+  const stream = ch.streams[attemptIndex]
+  if (!stream) return skipChannel()
+  stopPlayback()
+  needsTap = false
+  wasReady = false
+  showLoading(`Tuning to ${ch.name}`)
+
+  if (nativeHls) {
+    // Safari, including every browser on iPhone and iPad: the video tag plays HLS on its own.
+    video.src = stream.url
+    startPlay()
+  } else {
+    loadHlsJs().then(() => {
+      if (channels[current] !== ch || ch.streams[attemptIndex] !== stream) return
+      if (!window.Hls || !Hls.isSupported()) {
+        showMessage("This browser can't play live TV", 'Try Safari, Chrome, Edge or Firefox.')
+        return
+      }
+      hls = new Hls({ enableWorker: true, lowLatencyMode: false, backBufferLength: 30, manifestLoadingTimeOut: 10000, levelLoadingTimeOut: 10000, fragLoadingTimeOut: 12000 })
+      hls.on(Hls.Events.ERROR, (_, data) => { if (data.fatal) streamFailed(`hls.js ${data.type}: ${data.details}`) })
+      hls.loadSource(stream.url)
+      hls.attachMedia(video)
+      startPlay()
+    })
+  }
+  startTimer = setTimeout(() => { if (!needsTap) streamFailed('no picture after 12 seconds') }, START_TIMEOUT_MS)
+}
+
+function startPlay() {
+  const p = video.play()
+  if (p && p.catch) p.catch((err) => {
+    if (err && err.name === 'NotAllowedError') {
+      // The browser wants a tap before it plays sound. Hold the timer until then.
+      needsTap = true
+      clearTimeout(startTimer)
+      centre('<button class="big" id="tap-start">Tap to watch</button>')
+      $('tap-start').onclick = (e) => { e.stopPropagation(); needsTap = false; centre(''); showLoading(`Tuning to ${channels[current].name}`); startTimer = setTimeout(() => streamFailed('no picture after 12 seconds'), START_TIMEOUT_MS); video.play().catch(() => {}) }
+    }
+    // Other rejections (AbortError from a quick channel change, media errors) are handled by
+    // the error event or the 12 second timer.
+  })
+}
+
+function loadHlsJs() {
+  if (window.Hls) return Promise.resolve()
+  if (!hlsLoading) {
+    hlsLoading = new Promise((resolve) => {
+      const s = document.createElement('script')
+      s.src = HLS_JS_URL
+      s.onload = resolve
+      s.onerror = () => { hlsLoading = null; resolve() }
+      document.head.appendChild(s)
+    })
+  }
+  return hlsLoading
+}
+
+function streamFailed(why) {
+  if (current < 0 || !channels.length) return
+  console.log(`Aerial TV: ${channels[current].name} stream ${attemptIndex + 1} failed (${why})`)
+  clearTimeout(startTimer)
+  attemptIndex++
+  if (attemptIndex < channels[current].streams.length) playAttempt()
+  else skipChannel()
+}
+
+function skipChannel() {
+  stopPlayback()
+  skippedInRow++
+  if (skippedInRow >= Math.min(channels.length, MAX_SKIPS)) {
+    skippedInRow = 0
+    showMessage('No channel is playing right now', 'The free streams for this country all seem to be down at the moment. Try again in a while or pick another country.', { label: 'Try again', onClick: () => { skippedInRow = 0; tune(current) } })
+    return
+  }
+  tune(current + direction)
+}
+
+video.addEventListener('playing', () => {
+  clearTimeout(startTimer)
+  wasReady = true
+  skippedInRow = 0
+  centre('')
+})
+video.addEventListener('error', () => {
+  if (video.getAttribute('src') || hls) streamFailed(`media error ${video.error ? video.error.code : ''}`)
+})
+video.addEventListener('stalled', () => {
+  // A live stream that stops for a long time after it was playing is treated like a dead one.
+  if (!wasReady) return
+  clearTimeout(startTimer)
+  if (current >= 0) startTimer = setTimeout(() => { if (video.paused || video.readyState < 3) streamFailed('stalled') }, START_TIMEOUT_MS)
+})
+video.addEventListener('waiting', () => {
+  if (!wasReady) return
+  clearTimeout(startTimer)
+  if (current >= 0 && !needsTap) startTimer = setTimeout(() => streamFailed('buffering for too long'), START_TIMEOUT_MS * 2)
+})
+
+// ============================================================================================
+// Banner, top bar, digits
+// ============================================================================================
+function showBanner(ch) {
+  $('b-num').textContent = ch.number
+  $('b-name').textContent = ch.name
+  $('b-sub').textContent = `${ch.categories.map(categoryLabel).join(', ')} · ${country.flag || ''} ${country.name}`
+  const logo = $('b-logo')
+  if (ch.logo) { logo.src = ch.logo; logo.classList.remove('none') } else { logo.removeAttribute('src'); logo.classList.add('none') }
+  logo.onerror = () => logo.classList.add('none')
+  $('banner').classList.add('show')
+  clearTimeout(bannerTimer)
+  bannerTimer = setTimeout(() => $('banner').classList.remove('show'), 4000)
+  wakeTopbar()
+}
+
+function wakeTopbar() {
+  if (matchMedia('(hover: none)').matches) return
+  $('topbar').classList.add('show')
+  clearTimeout(topbarTimer)
+  topbarTimer = setTimeout(() => { if (!$('guide').classList.contains('open')) $('topbar').classList.remove('show') }, 3500)
+}
+
+function pressDigit(d) {
+  if (!channels.length) return
+  digits = (digits + d).slice(-4)
+  $('digits').textContent = digits
+  $('digits').hidden = false
+  clearTimeout(digitTimer)
+  digitTimer = setTimeout(jumpToNumber, 1800)
+}
+function jumpToNumber() {
+  clearTimeout(digitTimer)
+  const n = Number(digits)
+  digits = ''
+  $('digits').hidden = true
+  if (n >= 1 && n <= channels.length) { skippedInRow = 0; tune(n - 1) }
+}
+
+// ============================================================================================
+// Guide
+// ============================================================================================
+function renderGuideHead() {
+  $('g-flag').textContent = country ? country.flag || '' : ''
+  $('g-country').textContent = country ? country.name : 'Channels'
+  $('g-count').textContent = channels.length ? `${channels.length} channels` : ''
+}
+
+function renderGuide(filter) {
+  const list = $('g-list')
+  const q = (filter ?? $('g-search').value).trim().toLowerCase()
+  list.innerHTML = ''
+  if (!channels.length) return
+  const items = channels.filter((c) => !q || c.name.toLowerCase().includes(q) || String(c.number) === q || c.categories.some((g) => g.includes(q)))
+  if (!items.length) { list.innerHTML = '<div class="empty">No channel matches that.</div>'; return }
+  const frag = document.createDocumentFragment()
+  let lastGroup = null
+  for (const c of items) {
+    const group = categoryLabel(c.categories[0])
+    if (!q && group !== lastGroup) {
+      const h = document.createElement('div')
+      h.className = 'group'
+      h.textContent = group
+      frag.appendChild(h)
+      lastGroup = group
+    }
+    const b = document.createElement('button')
+    b.className = 'row' + (channels[current] === c ? ' current' : '')
+    b.dataset.key = c.key
+    b.innerHTML = `<span class="num">${c.number}</span><img class="logo${c.logo ? '' : ' none'}" loading="lazy" alt="" ${c.logo ? `src="${esc(c.logo)}"` : ''}><span class="name">${esc(c.name)}</span>${c.streams.every((s) => s.geoBlocked) ? '<span class="tag">Geo</span>' : ''}`
+    b.onclick = () => { closeGuide(); skippedInRow = 0; direction = 1; tune(channels.indexOf(c)) }
+    const img = b.querySelector('img')
+    img.onerror = () => img.classList.add('none')
+    frag.appendChild(b)
+  }
+  list.appendChild(frag)
+}
+
+function openGuide() {
+  if (!country) return openCountries()
+  $('g-search').value = ''
+  renderGuide('')
+  $('guide').classList.add('open')
+  $('topbar').classList.add('show')
+  const row = $('g-list').querySelector('.row.current')
+  if (row) { row.scrollIntoView({ block: 'center' }); if (matchMedia('(hover: hover)').matches) row.focus() }
+}
+function closeGuide() { $('guide').classList.remove('open'); wakeTopbar() }
+const guideOpen = () => $('guide').classList.contains('open')
+const countriesOpen = () => $('countries').classList.contains('open')
+
+// ============================================================================================
+// Input: keys, swipes, taps, buttons
+// ============================================================================================
+document.addEventListener('keydown', (e) => {
+  if (e.target && e.target.tagName === 'INPUT') {
+    if (e.key === 'Escape') { e.target.value = ''; e.target.blur(); if (countriesOpen() && country) closeCountries(); else closeGuide() }
+    if (e.key === 'Enter' && e.target.id === 'g-search') { const first = $('g-list').querySelector('.row'); if (first) first.click() }
+    return
+  }
+  if (countriesOpen()) {
+    if (e.key === 'Escape' && country) closeCountries()
+    return
+  }
+  if (guideOpen()) {
+    if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); closeGuide() }
+    return
+  }
+  switch (e.key) {
+    case 'ArrowUp': case 'PageUp': e.preventDefault(); zap(1); break
+    case 'ArrowDown': case 'PageDown': e.preventDefault(); zap(-1); break
+    case 'Enter': case ' ': e.preventDefault(); if (digits) jumpToNumber(); else openGuide(); break
+    case 'ArrowLeft': e.preventDefault(); openGuide(); break
+    case 'ArrowRight': case 'i': e.preventDefault(); if (channels.length) showBanner(channels[current]); break
+    case 'f': case 'F': toggleFullscreen(); break
+    case 'm': case 'M': toggleMute(); break
+    default:
+      if (/^[0-9]$/.test(e.key)) pressDigit(e.key)
+  }
+})
+
+// Swipes on the picture change channel, a tap opens the guide.
+{
+  const tap = $('tap')
+  let sx = 0, sy = 0, st = 0, active = false
+  tap.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; st = Date.now(); active = true; wakeTopbar() })
+  tap.addEventListener('pointerup', (e) => {
+    if (!active) return
+    active = false
+    const dx = e.clientX - sx, dy = e.clientY - sy, dt = Date.now() - st
+    if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) * 1.5 && dt < 1000) zap(dy < 0 ? 1 : -1)   // swipe up: next channel
+    else if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && dt < 600) openGuide()
+  })
+  tap.addEventListener('pointercancel', () => { active = false })
+  tap.addEventListener('wheel', (e) => { e.preventDefault() }, { passive: false })
+  document.addEventListener('mousemove', wakeTopbar)
+}
+
+$('btn-guide').onclick = openGuide
+$('btn-close').onclick = closeGuide
+$('btn-country').onclick = openCountries
+$('btn-c-close').onclick = closeCountries
+$('btn-full').onclick = toggleFullscreen
+$('btn-mute').onclick = toggleMute
+$('g-search').addEventListener('input', (e) => renderGuide(e.target.value))
+$('c-search').addEventListener('input', (e) => renderCountries(e.target.value))
+$('guide').addEventListener('click', (e) => { if (e.target === $('guide')) closeGuide() })
+$('countries').addEventListener('click', (e) => { if (e.target === $('countries') && country) closeCountries() })
+
+function toggleFullscreen() {
+  const el = document.documentElement
+  if (document.fullscreenElement) document.exitFullscreen()
+  else if (el.requestFullscreen) el.requestFullscreen().catch(() => {})
+  else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen()   // iPhone: only the video can go full screen
+}
+
+function toggleMute() {
+  video.muted = !video.muted
+  $('ico-sound').innerHTML = video.muted
+    ? '<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m16 9 6 6M22 9l-6 6"/>'
+    : '<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/>'
+}
+
+// AirPlay. Safari fires this event when there is a receiver on the network, and the button
+// opens Apple's picker. x-webkit-airplay="allow" on the video tag is what lets the stream leave.
+if (window.WebKitPlaybackTargetAvailabilityEvent) {
+  video.addEventListener('webkitplaybacktargetavailabilitychanged', (e) => {
+    $('btn-airplay').hidden = e.availability !== 'available'
+  })
+  $('btn-airplay').onclick = () => video.webkitShowPlaybackTargetPicker()
+}
+
+// ============================================================================================
+// Start
+// ============================================================================================
+async function main() {
+  showLoading('Starting')
+  try { await loadCountries() } catch {
+    showMessage("Can't reach the internet", 'Check your connection, then try again.', { label: 'Try again', onClick: main })
+    return
+  }
+  const fromUrl = new URLSearchParams(location.search).get('country')
+  const code = (fromUrl || store.get('aerialtv.country') || '').toLowerCase()
+  country = countries.find((c) => c.code === code) || null
+  if (country) { store.set('aerialtv.country', country.code); loadCountry() }
+  else { centre(''); openCountries() }
+}
+main()
+</script>
+</body>
+</html>

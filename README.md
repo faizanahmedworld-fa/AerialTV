@@ -11,6 +11,26 @@
   No account to make and no monthly bill. Pick your country once and it plays.
 </p>
 
+<p align="center">
+  <a href="https://faizanahmedworld-fa.github.io/AerialTV/">Website</a> &middot;
+  <a href="https://faizanahmedworld-fa.github.io/AerialTV/watch/">Watch in your browser</a> &middot;
+  <a href="https://github.com/faizanahmedworld-fa/AerialTV/releases/latest">Latest release</a> &middot;
+  <a href="#something-not-working">Help</a>
+</p>
+
+<br>
+
+Aerial TV is a free IPTV player for Android TV, Google TV, Fire TV Stick, Android phones and tablets, Windows PCs and web browsers. It plays free public M3U and HLS live TV channels from 189 countries, built on the open [iptv-org](https://github.com/iptv-org/iptv) playlists. The Android app is written in Kotlin and is about 2 MB. This project is not the older Aerial TV app for RTL-SDR receivers.
+
+## What you get
+
+* Live TV channels from 189 countries. Your country is picked for you on first run.
+* Made for a remote: up and down change channel, number keys jump to a channel, OK opens the list, and holding OK adds a favourite.
+* Dead free streams are skipped on their own, and channels with backup links try each one first.
+* It remembers your last channel and your favourites, and both survive an update.
+* Runs on Android TV, Google TV, Fire TV Stick, Android phones, Windows, and in Safari or Chrome (with AirPlay to an Apple TV).
+* No account, no subscription, no ads, and no video hosted by us.
+
 <br>
 
 <p align="center">
@@ -97,7 +117,7 @@ If the TV has a Google TV or Android TV badge on the box (some Hisense, Philips 
 There's no app to install, because Apple only allows apps from its App Store and the App Store doesn't take players that come with channels built in. Instead, Aerial TV runs as a web page in Safari. Open this on the iPhone or iPad:
 
 ```
-https://faizanahmedworld-fa.github.io/AerialTV/
+https://faizanahmedworld-fa.github.io/AerialTV/watch/
 ```
 
 1. Pick your country. Tap the picture once to start, then swipe up or down to change channel.
@@ -153,6 +173,14 @@ https://raw.githubusercontent.com/faizanahmedworld-fa/AerialTV/main/release/Aeri
 ## Where do the channels come from?
 
 Aerial TV plays free public streams listed by the open [iptv-org](https://github.com/iptv-org/iptv) project. We don't host any video ourselves.
+
+## Why isn't it on Google Play or the App Store?
+
+Store review rules make a player with channels built in hard to publish, and Apple's App Store doesn't take them at all. So Android users install from the download link above, and iPhone and iPad users open the browser version. The reasoning is written up in [docs/Apple.md](docs/Apple.md).
+
+## Takedown requests
+
+Aerial TV doesn't host or control any of the streams it plays. They are free public streams published by third parties and listed by iptv-org. If you own a stream and want it taken down, tell iptv-org, or [open an issue](https://github.com/faizanahmedworld-fa/AerialTV/issues) here and we'll look at it.
 
 <br>
 
