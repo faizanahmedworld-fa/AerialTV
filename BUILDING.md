@@ -12,6 +12,10 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 * Dead streams are skipped on their own. Each channel keeps all its backup links (SD, HD, mirrors) and tries them in turn, 12 seconds each, before moving to the next channel.
 * Guesses the country from the mobile network, SIM, time zone, then device language. TV boxes usually ship in US English but with the right time zone, so the time zone does most of the work.
 * Favourites: hold OK on a channel.
+* First run setup (`OnboardingActivity`): country, who's watching (kids, family, adults), interests, languages. Every answer is editable from Settings (the cog in the channel list), which opens the same screen on one step.
+* "For you" is scored on the device from those answers plus favourites and watch history (`Recommendations.kt`); "Most watched" is watch history alone. History is per country, kept in `Prefs`, capped at 60 channels, and never leaves the device.
+* Languages: up to three of the viewer's languages are fetched as iptv-org language playlists (`languages/urd.m3u` and so on, cached for a day) and matched to the country's channels by `tvg-id`. Each language with matches gets its own row in the category list. `app/src/main/assets/languages.json` is the list offered, with the countries each one is suggested for.
+* Search: the box above the channel list matches name, number or category. The Search key on a remote opens the list with the box focused.
 * Playlists come from iptv-org.github.io, GitHub raw and jsDelivr, started 2.5 seconds apart, and the first good answer wins. Some ISPs block github.io. The last good list is cached for 6 hours and used offline.
 * Android 5.0 and up. APK is about 2 MB.
 
@@ -20,12 +24,16 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 | Path | What's in it |
 | --- | --- |
 | `app/src/main/java/tv/aerialtv/app/MainActivity.kt` | The TV screen: player, remote keys, channel list, auto skip |
-| `app/src/main/java/tv/aerialtv/app/CountryActivity.kt` | First run country picker |
+| `app/src/main/java/tv/aerialtv/app/OnboardingActivity.kt` | First run steps (country, who's watching, interests, languages) and the single step editor Settings opens |
+| `app/src/main/java/tv/aerialtv/app/SettingsActivity.kt` | Settings list: every setup answer, run setup again, clear history, about |
+| `app/src/main/java/tv/aerialtv/app/Recommendations.kt` | For you scoring, Most watched, and channel search |
+| `app/src/main/java/tv/aerialtv/app/PickerAdapters.kt`, `GuideAdapters.kt`, `Ui.kt` | List adapters, focus and fade animations |
 | `app/src/main/java/tv/aerialtv/app/M3uParser.kt` | Reads iptv-org playlists and merges feeds of the same channel |
 | `app/src/main/java/tv/aerialtv/app/ChannelRepository.kt` | Downloads and caches playlists |
-| `app/src/main/java/tv/aerialtv/app/Prefs.kt` | Saved country, last channel, favourites, country detection |
+| `app/src/main/java/tv/aerialtv/app/Prefs.kt` | Saved country, profile, interests, languages, last channel, favourites, watch history, country detection |
 | `app/src/main/assets/countries.json` | Countries that have a playlist, from iptv-org's `PLAYLISTS.md` |
-| `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists |
+| `app/src/main/assets/languages.json` | Languages offered at setup (ISO 639-3 codes, the names of iptv-org's language playlists) and which countries suggest them |
+| `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists, plus recommendation and search tests |
 | `tools/icons.ps1` | Draws the launcher icons and the Android TV banner |
 | `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL`, plus browser safe copies for the web player |
 | `web/index.html` | The landing page people find through Google: what the app is, install steps, a link per country, structured data. Plain HTML, no build step |

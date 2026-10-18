@@ -20,23 +20,44 @@ import java.net.URL
  */
 class ChannelRepository(private val context: Context) {
 
-    private val sources = buildList {
-        if (BuildConfig.MIRROR_URL.isNotBlank()) add(BuildConfig.MIRROR_URL)
-        add("https://iptv-org.github.io/iptv/countries/%s.m3u")
-        add("https://raw.githubusercontent.com/iptv-org/iptv/gh-pages/countries/%s.m3u")
-        add("https://cdn.jsdelivr.net/gh/iptv-org/iptv@gh-pages/countries/%s.m3u")
+    private val hosts = listOf(
+        "https://iptv-org.github.io/iptv/%s",
+        "https://raw.githubusercontent.com/iptv-org/iptv/gh-pages/%s",
+        "https://cdn.jsdelivr.net/gh/iptv-org/iptv@gh-pages/%s",
+    )
+
+    private fun sourcesFor(path: String) = buildList {
+        // The mirror only carries country lists, so language lists skip it.
+        if (BuildConfig.MIRROR_URL.isNotBlank() && path.startsWith("countries/")) {
+            add(BuildConfig.MIRROR_URL.format(path.removePrefix("countries/").removeSuffix(".m3u")))
+        }
+        hosts.forEach { add(it.format(path)) }
     }
 
-    suspend fun load(country: String): List<Channel> = withContext(Dispatchers.IO) {
-        val cache = File(context.filesDir, "playlist_$country.m3u")
+    suspend fun load(country: String): List<Channel> =
+        loadPlaylist("countries/$country.m3u", "playlist_$country.m3u", CACHE_MS)
+
+    /**
+     * The channel keys in one of iptv-org's language playlists (languages/urd.m3u and so on),
+     * used to tag the country's channels with the languages the viewer asked for. Big lists
+     * like English run to a megabyte, so they are kept for a day.
+     */
+    suspend fun loadLanguageKeys(code: String): Set<String> =
+        runCatching { loadPlaylist("languages/$code.m3u", "language_$code.m3u", LANGUAGE_CACHE_MS) }
+            .getOrDefault(emptyList())
+            .map { it.key }
+            .toSet()
+
+    private suspend fun loadPlaylist(path: String, cacheName: String, maxAge: Long): List<Channel> = withContext(Dispatchers.IO) {
+        val cache = File(context.filesDir, cacheName)
         val age = System.currentTimeMillis() - cache.lastModified()
 
-        if (cache.exists() && age < CACHE_MS) {
+        if (cache.exists() && age < maxAge) {
             val cached = M3uParser.parse(cache.readText())
             if (cached.isNotEmpty()) return@withContext cached
         }
 
-        val text = downloadFirst(country)
+        val text = downloadFirst(sourcesFor(path))
         if (text != null) {
             cache.writeText(text)
             return@withContext M3uParser.parse(text)
@@ -50,13 +71,13 @@ class ChannelRepository(private val context: Context) {
      * Starts each source a moment after the previous one and takes whichever answers first.
      * A blocked host can hang for 20 seconds before failing, and nobody should wait for that.
      */
-    private suspend fun downloadFirst(country: String): String? {
+    private suspend fun downloadFirst(sources: List<String>): String? {
         val results = ResultChannel<String?>(sources.size)
         val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        sources.forEachIndexed { i, pattern ->
+        sources.forEachIndexed { i, url ->
             scope.launch {
                 delay(i * STAGGER_MS)
-                results.send(fetch(pattern.format(country))?.takeIf { "#EXTINF" in it })
+                results.send(fetch(url)?.takeIf { "#EXTINF" in it })
             }
         }
         try {
@@ -86,6 +107,7 @@ class ChannelRepository(private val context: Context) {
 
     private companion object {
         const val CACHE_MS = 6 * 60 * 60 * 1000L
+        const val LANGUAGE_CACHE_MS = 24 * 60 * 60 * 1000L
         const val STAGGER_MS = 2_500L
     }
 }

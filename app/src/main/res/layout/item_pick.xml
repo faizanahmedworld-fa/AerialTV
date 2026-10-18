@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/bg_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="58dp"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="14dp">
+
+    <TextView
+        android:id="@+id/pickEmoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        android:textSize="24sp" />
+
+    <ImageView
+        android:id="@+id/pickIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:importantForAccessibility="no"
+        android:tint="@color/text_secondary" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/pickTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/Aerial.Text.Heading" />
+
+        <TextView
+            android:id="@+id/pickSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="@style/Aerial.Text.Caption" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/pickTrailing"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="10dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_check"
+        android:tint="@color/accent" />
+</LinearLayout>

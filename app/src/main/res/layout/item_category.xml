@@ -7,25 +7,34 @@
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="48dp"
+    android:minHeight="50dp"
     android:orientation="horizontal"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp">
+
+    <ImageView
+        android:id="@+id/categoryIcon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:importantForAccessibility="no"
+        android:tint="@color/text_secondary" />
 
     <TextView
         android:id="@+id/categoryLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/text_primary"
-        android:textSize="18sp" />
+        android:textAppearance="@style/Aerial.Text.Label"
+        android:textSize="17sp" />
 
     <TextView
         android:id="@+id/categoryCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp" />
+        android:layout_marginStart="8dp"
+        android:textAppearance="@style/Aerial.Text.Caption"
+        android:textColor="@color/text_dim" />
 </LinearLayout>

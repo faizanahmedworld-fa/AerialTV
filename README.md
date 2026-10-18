@@ -25,6 +25,8 @@ Aerial TV is a free IPTV player for Android TV, Google TV, Fire TV Stick, Androi
 ## What you get
 
 * Live TV channels from 189 countries. Your country is picked for you on first run.
+* A short setup asks who's watching (kids, family or adults), what you like and which languages you speak. That builds a For you row, and Most watched fills itself from what you actually leave on.
+* Search channels by name, number or type ("sport", "news") from the channel list. Settings lets you change any answer later.
 * Made for a remote: up and down change channel, number keys jump to a channel, OK opens the list, and holding OK adds a favourite.
 * Dead free streams are skipped on their own, and channels with backup links try each one first.
 * It remembers your last channel and your favourites, and both survive an update.
@@ -166,7 +168,7 @@ https://raw.githubusercontent.com/faizanahmedworld-fa/AerialTV/main/release/Aeri
 
 **A channel plays at home but not when you travel.** Some broadcasters only allow viewers inside their own country. A Pakistani channel might play in Lahore and stay dark in Dubai. That's their rule, not a fault in the app.
 
-**Wrong country?** Press **OK** to open the channel list and use **Change country** at the top.
+**Wrong country?** Press **OK** to open the channel list and use the country button at the top. The cog next to the search box opens Settings, where who's watching, interests and languages can be changed too.
 
 **New version out?** Install it the same way, over the old one. Your favourites and last channel stay.
 

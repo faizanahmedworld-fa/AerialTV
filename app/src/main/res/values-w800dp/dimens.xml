@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="guide_channels_width">440dp</dimen>
+    <dimen name="guide_channels_width">460dp</dimen>
+    <dimen name="guide_categories_width">270dp</dimen>
+    <dimen name="screen_padding">56dp</dimen>
 </resources>

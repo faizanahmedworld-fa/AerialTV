@@ -7,21 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 
-data class GuideCategory(val id: String, val label: String, val count: Int)
-
-fun ImageView.loadLogo(url: String?) {
-    if (url.isNullOrBlank()) {
-        setImageResource(R.drawable.ic_tv_placeholder)
-    } else {
-        load(url) {
-            crossfade(false)
-            placeholder(R.drawable.ic_tv_placeholder)
-            error(R.drawable.ic_tv_placeholder)
-        }
-    }
-}
+data class GuideCategory(val id: String, val label: String, val count: Int, val icon: Int)
 
 class CategoryAdapter(
     private val onFocus: (GuideCategory) -> Unit,
@@ -40,13 +27,15 @@ class CategoryAdapter(
         setHasStableIds(true)
     }
 
-    fun setSelected(id: String) {
+    fun setSelected(id: String?) {
         if (selected == id) return
         val old = items.indexOfFirst { it.id == selected }
         selected = id
         if (old >= 0) notifyItemChanged(old)
         items.indexOfFirst { it.id == id }.takeIf { it >= 0 }?.let { notifyItemChanged(it) }
     }
+
+    fun labelOf(id: String): String = items.firstOrNull { it.id == id }?.label.orEmpty()
 
     override fun getItemId(position: Int) = items[position].id.hashCode().toLong()
 
@@ -59,12 +48,17 @@ class CategoryAdapter(
         val item = items[position]
         holder.label.text = item.label
         holder.count.text = item.count.toString()
+        holder.icon.setImageResource(item.icon)
         holder.itemView.isActivated = item.id == selected
         holder.itemView.setOnClickListener { onClick(item) }
-        holder.itemView.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) onFocus(item) }
+        holder.itemView.setOnFocusChangeListener { v, hasFocus ->
+            v.focusScale(hasFocus, 1.02f)
+            if (hasFocus) onFocus(item)
+        }
     }
 
     class Holder(view: View) : RecyclerView.ViewHolder(view) {
+        val icon: ImageView = view.findViewById(R.id.categoryIcon)
         val label: TextView = view.findViewById(R.id.categoryLabel)
         val count: TextView = view.findViewById(R.id.categoryCount)
     }
@@ -103,15 +97,16 @@ class ChannelAdapter(
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val ch = items[position]
         val ctx = holder.itemView.context
+        val playing = ch.key == playingKey
         holder.number.text = ch.number.toString()
         holder.name.text = ch.name
-        holder.name.setTextColor(
-            ContextCompat.getColor(ctx, if (ch.key == playingKey) R.color.accent else R.color.text_primary)
-        )
+        holder.name.setTextColor(ContextCompat.getColor(ctx, if (playing) R.color.accent else R.color.text_primary))
+        holder.playing.visibility = if (playing) View.VISIBLE else View.GONE
         holder.category.text = ch.categories.joinToString("  ·  ") { Categories.label(it) }
         holder.favorite.visibility = if (isFavorite(ch)) View.VISIBLE else View.GONE
         holder.logo.loadLogo(ch.logo)
         holder.itemView.setOnClickListener { onClick(ch) }
+        holder.itemView.setOnFocusChangeListener { v, hasFocus -> v.focusScale(hasFocus, 1.02f) }
         holder.itemView.setOnLongClickListener {
             onLongClick(ch)
             notifyItemChanged(holder.bindingAdapterPosition)
@@ -124,6 +119,7 @@ class ChannelAdapter(
         val logo: ImageView = view.findViewById(R.id.channelLogo)
         val name: TextView = view.findViewById(R.id.channelName)
         val category: TextView = view.findViewById(R.id.channelCategory)
-        val favorite: TextView = view.findViewById(R.id.channelFavorite)
+        val favorite: ImageView = view.findViewById(R.id.channelFavorite)
+        val playing: ImageView = view.findViewById(R.id.channelPlaying)
     }
 }

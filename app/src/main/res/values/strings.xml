@@ -13,18 +13,83 @@
     <string name="error_all_down">These channels aren\'t answering right now. Check your internet and press Try again.</string>
     <string name="try_again">Try again</string>
     <string name="change_country">Change country</string>
+    <string name="settings">Settings</string>
 
-    <string name="cat_favorites">♥  Favourites</string>
+    <string name="cat_for_you">For you</string>
+    <string name="cat_most_watched">Most watched</string>
+    <string name="cat_favorites">Favourites</string>
     <string name="cat_all">All channels</string>
+    <string name="cat_kids">Kids</string>
     <string name="favorite_added">%1$s added to Favourites</string>
     <string name="favorite_removed">%1$s removed from Favourites</string>
+
+    <string name="search_hint">Search channels or type a number</string>
+    <string name="search_empty">No channel matches \"%1$s\"</string>
+    <plurals name="search_results">
+        <item quantity="one">%1$d channel found</item>
+        <item quantity="other">%1$d channels found</item>
+    </plurals>
 
     <string name="banner_hint">"▲ ▼  change channel   ·   OK  all channels"</string>
     <string name="guide_hint">Hold OK on a channel to add it to Favourites</string>
     <string name="legal_note">Aerial TV plays free public streams listed by the iptv-org project. We don\'t host any video.</string>
 
-    <string name="country_title">Where are you watching from?</string>
-    <string name="country_subtitle">Pick your country and we\'ll load its free channels. You can change this later from the channel list.</string>
+    <!-- First run steps -->
+    <string name="step_of">Step %1$d of %2$d</string>
+    <string name="step_country_title">Where are you watching from?</string>
+    <string name="step_country_subtitle">Pick your country and we\'ll load its free channels. You can change this later in Settings.</string>
+    <string name="step_profile_title">Who\'s watching?</string>
+    <string name="step_profile_subtitle">This decides what comes first in your For you list. Change it any time.</string>
+    <string name="step_interests_title">What do you like to watch?</string>
+    <string name="step_interests_subtitle">Pick as many as you like. Your For you list is built from these.</string>
+    <string name="step_languages_title">Which languages do you watch in?</string>
+    <string name="step_languages_subtitle">Channels in these languages get a boost. The ones people in your country usually want are at the top.</string>
+    <string name="step_done_title">You\'re all set</string>
+    <string name="step_done_subtitle">Your For you list is ready. Hold OK on any channel to add it to Favourites, and press OK while watching to open the list.</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="start_watching">Start watching</string>
+    <string name="save">Save</string>
     <string name="suggested">Suggested</string>
     <string name="all_countries">All countries</string>
+    <string name="all_languages">All languages</string>
+    <string name="search_countries">Search countries</string>
+    <string name="search_languages">Search languages</string>
+    <string name="nothing_matches">Nothing matches that</string>
+    <string name="chosen_count">%1$d chosen</string>
+
+    <string name="profile_kids">Kids</string>
+    <string name="profile_kids_desc">Cartoons and learning channels come first</string>
+    <string name="profile_family">Family</string>
+    <string name="profile_family_desc">A bit of everything for the whole house</string>
+    <string name="profile_adults">Adults</string>
+    <string name="profile_adults_desc">News, sport and films up front</string>
+
+    <string name="interest_news">News</string>
+    <string name="interest_sports">Sports</string>
+    <string name="interest_movies">Movies</string>
+    <string name="interest_kids">Cartoons</string>
+    <string name="interest_music">Music</string>
+    <string name="interest_entertainment">Entertainment</string>
+    <string name="interest_learning">Documentaries</string>
+    <string name="interest_religious">Religious</string>
+    <string name="interest_business">Business</string>
+    <string name="interest_food">Food and travel</string>
+
+    <!-- Settings -->
+    <string name="settings_subtitle">Change any answer from the first run. Favourites and watch history stay on this device and are never sent anywhere.</string>
+    <string name="settings_section_you">Your TV</string>
+    <string name="settings_section_app">App</string>
+    <string name="settings_country">Country</string>
+    <string name="settings_profile">Who\'s watching</string>
+    <string name="settings_interests">Interests</string>
+    <string name="settings_languages">Languages</string>
+    <string name="settings_rerun">Run setup again</string>
+    <string name="settings_rerun_desc">Walk through the first run steps from the start</string>
+    <string name="settings_clear">Clear favourites and history</string>
+    <string name="settings_clear_desc">For you and Most watched start again from scratch</string>
+    <string name="settings_cleared">Favourites and history cleared</string>
+    <string name="settings_about">About Aerial TV</string>
+    <string name="settings_about_desc">Version %1$s. Free public streams listed by iptv-org. No video is hosted by us.</string>
+    <string name="not_set">Not set</string>
 </resources>

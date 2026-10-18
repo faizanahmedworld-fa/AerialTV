@@ -5,20 +5,122 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:statusBarColor">@android:color/black</item>
         <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowAnimationStyle">@style/Aerial.WindowAnimation</item>
         <item name="colorPrimary">@color/navy</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/text_primary</item>
+        <item name="colorControlActivated">@color/accent</item>
+        <item name="colorControlHighlight">@color/item_active</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_dim</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Aerial.WindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/fade_out</item>
+    </style>
+
+    <!-- Type scale. Roboto on Android TV, Amazon Ember on Fire TV, both through the same family names. -->
+    <style name="Aerial.Text" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Aerial.Text.Display">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="Aerial.Text.Title">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Aerial.Text.Heading">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="Aerial.Text.Body">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+
+    <style name="Aerial.Text.Label">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Aerial.Text.Caption">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="Aerial.Text.Overline">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textColor">@color/accent</item>
+    </style>
+
+    <style name="Aerial.Text.Number">
+        <item name="android:fontFamily">sans-serif-condensed-medium</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/text_dim</item>
     </style>
 
     <style name="Aerial.Button" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/bg_button</item>
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingStart">22dp</item>
+        <item name="android:paddingEnd">22dp</item>
+        <item name="android:minHeight">50dp</item>
         <item name="android:focusable">true</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:drawableTint">@color/text_primary</item>
+    </style>
+
+    <style name="Aerial.Button.Primary">
+        <item name="android:background">@drawable/bg_primary</item>
+        <item name="android:textColor">@color/on_accent</item>
+        <item name="android:drawableTint">@color/on_accent</item>
+        <item name="android:paddingStart">28dp</item>
+        <item name="android:paddingEnd">28dp</item>
+    </style>
+
+    <style name="Aerial.IconButton" parent="Widget.AppCompat.ImageButton">
+        <item name="android:background">@drawable/bg_icon_button</item>
+        <item name="android:layout_width">46dp</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:padding">11dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:focusable">true</item>
+        <item name="android:tint">@color/text_primary</item>
+    </style>
+
+    <style name="Aerial.Search" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/bg_search</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_dim</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:minHeight">46dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:inputType">textNoSuggestions|textCapWords</item>
+        <item name="android:imeOptions">actionSearch|flagNoExtractUi</item>
+        <item name="android:drawableStart">@drawable/ic_search</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:drawableTint">@color/text_dim</item>
     </style>
 </resources>

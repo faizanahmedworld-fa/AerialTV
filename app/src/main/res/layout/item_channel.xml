@@ -8,24 +8,26 @@
     android:focusable="true"
     android:gravity="center_vertical"
     android:longClickable="true"
-    android:minHeight="64dp"
+    android:minHeight="66dp"
     android:orientation="horizontal"
-    android:paddingStart="14dp"
+    android:paddingStart="12dp"
     android:paddingEnd="14dp">
 
     <TextView
         android:id="@+id/channelNumber"
-        android:layout_width="52dp"
+        android:layout_width="44dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/text_secondary"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:gravity="end"
+        android:textAppearance="@style/Aerial.Text.Number" />
 
     <ImageView
         android:id="@+id/channelLogo"
-        android:layout_width="64dp"
-        android:layout_height="44dp"
+        android:layout_width="66dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_logo_frame"
         android:importantForAccessibility="no"
+        android:padding="4dp"
         android:scaleType="fitCenter" />
 
     <LinearLayout
@@ -41,8 +43,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="19sp" />
+            android:textAppearance="@style/Aerial.Text.Heading" />
 
         <TextView
             android:id="@+id/channelCategory"
@@ -50,17 +51,26 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textAppearance="@style/Aerial.Text.Caption" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/channelFavorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/channelPlaying"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_marginStart="8dp"
-        android:text="♥"
-        android:textColor="@color/accent"
-        android:textSize="20sp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_play"
+        android:tint="@color/accent"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/channelFavorite"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_heart"
+        android:tint="@color/accent"
         android:visibility="gone" />
 </LinearLayout>

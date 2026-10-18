@@ -3,26 +3,26 @@
     <item android:state_focused="true">
         <shape>
             <solid android:color="@color/screen_blue" />
-            <corners android:radius="10dp" />
+            <corners android:radius="14dp" />
             <stroke android:width="2dp" android:color="@color/accent" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
             <solid android:color="@color/screen_blue" />
-            <corners android:radius="10dp" />
+            <corners android:radius="14dp" />
         </shape>
     </item>
     <item android:state_activated="true">
         <shape>
-            <solid android:color="@color/item_active" />
-            <corners android:radius="10dp" />
+            <solid android:color="@color/accent_soft" />
+            <corners android:radius="14dp" />
         </shape>
     </item>
     <item>
         <shape>
             <solid android:color="@android:color/transparent" />
-            <corners android:radius="10dp" />
+            <corners android:radius="14dp" />
         </shape>
     </item>
 </selector>
