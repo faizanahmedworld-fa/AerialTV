@@ -38,9 +38,14 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlin.math.abs
 
 /**
@@ -67,6 +72,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bannerLogo: ImageView
     private lateinit var bannerName: TextView
     private lateinit var bannerInfo: TextView
+    private lateinit var bannerSignal: SignalBarsView
+    private lateinit var bannerSignalText: TextView
     private lateinit var numberEntry: TextView
     private lateinit var guide: View
     private lateinit var guidePanel: View
@@ -80,6 +87,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var channelAdapter: ChannelAdapter
+    private lateinit var health: HealthStore
 
     private var countries: List<Country> = emptyList()
     private var languageNames: Map<String, String> = emptyMap()
@@ -104,6 +112,8 @@ class MainActivity : AppCompatActivity() {
     private var guideHiding = false
     private var loadJob: Job? = null
     private var languageJob: Job? = null
+    private var probeJob: Job? = null
+    private var rebuffers = 0
     private var toast: Toast? = null
     private var watchedKey: String? = null
     private var watchStart = 0L
@@ -115,6 +125,8 @@ class MainActivity : AppCompatActivity() {
     private val retryTask = Runnable { playAttempt() }
     private val digitsTask = Runnable { jumpToNumber() }
     private var categoryTask: Runnable? = null
+    private val signalRefreshTask = Runnable { if (guide.isVisible) channelAdapter.refreshSignals() }
+    private val liveSignalTask = Runnable { updateLiveSignal() }
 
     private data class Attempt(val stream: StreamSource, val mimeType: String?)
 
@@ -147,6 +159,7 @@ class MainActivity : AppCompatActivity() {
 
         prefs = Prefs(this)
         repo = ChannelRepository(this)
+        health = HealthStore(prefs)
         countries = Countries.all(this)
         languageNames = Languages.all(this).associate { it.code to it.name }
 
@@ -171,8 +184,10 @@ class MainActivity : AppCompatActivity() {
         handler.removeCallbacks(stallTask)
         handler.removeCallbacks(retryTask)
         handler.removeCallbacks(tunePendingTask)
+        handler.removeCallbacks(liveSignalTask)
         clearDigits()
         closeWatch()
+        health.save()
         player.stop()
     }
 
@@ -211,6 +226,8 @@ class MainActivity : AppCompatActivity() {
         bannerLogo = findViewById(R.id.bannerLogo)
         bannerName = findViewById(R.id.bannerName)
         bannerInfo = findViewById(R.id.bannerInfo)
+        bannerSignal = findViewById(R.id.bannerSignal)
+        bannerSignalText = findViewById(R.id.bannerSignalText)
         numberEntry = findViewById(R.id.numberEntry)
         guide = findViewById(R.id.guide)
         guidePanel = findViewById(R.id.guidePanel)
@@ -241,11 +258,13 @@ class MainActivity : AppCompatActivity() {
             override fun onPlaybackStateChanged(state: Int) {
                 when (state) {
                     Player.STATE_READY -> {
+                        if (!wasReady) rebuffers = 0
                         wasReady = true
                         retries = 0
                         handler.removeCallbacks(stallTask)
                         showLoading(null)
                         skippedInRow = 0
+                        updateLiveSignal()
                         // Remembered only once it has shown a picture, so a dead channel never
                         // becomes the one the app opens on next time.
                         channels.getOrNull(current)?.let { ch ->
@@ -255,8 +274,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     Player.STATE_BUFFERING -> if (wasReady) {
                         // Mid-programme hiccup: give it longer before giving up on this link.
+                        rebuffers++
                         handler.removeCallbacks(stallTask)
                         handler.postDelayed(stallTask, STALL_MS)
+                        updateLiveSignal()
                     }
                     Player.STATE_ENDED -> tryNextAttempt()
                     else -> Unit
@@ -300,6 +321,7 @@ class MainActivity : AppCompatActivity() {
         )
         channelAdapter = ChannelAdapter(
             isFavorite = { it.key in prefs.favorites() },
+            signalOf = { health.bars(it.key) },
             onClick = { ch ->
                 hideGuide()
                 skippedInRow = 0
@@ -432,6 +454,7 @@ class MainActivity : AppCompatActivity() {
             loadedCountry = code
             channels = list
             channelLanguages = emptyMap()
+            health.load(code)
             skippedInRow = 0
             current = -1
             previous = -1
@@ -444,7 +467,71 @@ class MainActivity : AppCompatActivity() {
                 ?: forYou.firstOrNull()?.let { channels.indexOf(it) }
                 ?: 0
             tune(start)
+            probeSignals()
         }
+    }
+
+    /**
+     * Checks every channel's link in the background, favourites and For you first, so the bars
+     * in the list mean something. Pauses while the app is in the background, and channels
+     * checked in the last six hours are left alone.
+     */
+    private fun probeSignals() {
+        probeJob?.cancel()
+        probeJob = lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val favs = prefs.favorites()
+                val queue = (forYou + channels.filter { it.key in favs } + channels).distinct()
+                    .filter { health.isStale(it.key) }
+                val gate = Semaphore(PROBE_PARALLEL)
+                queue.map { ch ->
+                    async {
+                        gate.withPermit {
+                            val bars = StreamProbe.bars(ch)
+                            // The channel on screen knows better than a probe.
+                            if (channels.getOrNull(current)?.key != ch.key || !wasReady) {
+                                health.set(ch.key, bars)
+                                scheduleSignalRefresh()
+                            }
+                        }
+                    }
+                }.awaitAll()
+                health.save()
+            }
+        }
+    }
+
+    private fun scheduleSignalRefresh() {
+        handler.removeCallbacks(signalRefreshTask)
+        handler.postDelayed(signalRefreshTask, 400)
+    }
+
+    /** Bars for the channel that is playing, from how much it has buffered ahead. */
+    private fun updateLiveSignal() {
+        handler.removeCallbacks(liveSignalTask)
+        val ch = channels.getOrNull(current) ?: return
+        if (pending >= 0) return
+        val bars = when {
+            !wasReady -> return
+            player.playbackState == Player.STATE_BUFFERING -> 1
+            else -> {
+                val ahead = player.bufferedPosition - player.currentPosition
+                when {
+                    ahead > 6_000 && rebuffers < 2 -> 4
+                    ahead > 2_500 || rebuffers < 2 -> 3
+                    else -> 2
+                }
+            }
+        }
+        health.set(ch.key, bars)
+        if (banner.isVisible) showSignal(bars)
+        if (guide.isVisible) scheduleSignalRefresh()
+        if (player.isPlaying) handler.postDelayed(liveSignalTask, 2_000)
+    }
+
+    private fun showSignal(bars: Int) {
+        bannerSignal.bars = bars
+        bannerSignalText.text = getString(SignalBarsView.labelFor(bars))
     }
 
     /** Tags channels with the languages chosen at setup, from iptv-org's language playlists. */
@@ -553,6 +640,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun skipChannel() {
         player.stop()
+        channels.getOrNull(current)?.let { health.set(it.key, 1) }
         skippedInRow++
         if (skippedInRow >= minOf(channels.size, MAX_SKIPS)) {
             skippedInRow = 0
@@ -648,8 +736,9 @@ class MainActivity : AppCompatActivity() {
         bannerNumber.text = ch.number.toString()
         bannerName.text = ch.name
         val langs = channelLanguages[ch.key].orEmpty().mapNotNull { languageNames[it] }
-        bannerInfo.text = (ch.categories.map { Categories.label(it) } + langs).joinToString("  ·  ")
+        bannerInfo.text = (ch.categories.map { Categories.label(this, it) } + langs).joinToString("  ·  ")
         bannerLogo.loadLogo(ch.logo)
+        showSignal(health.bars(ch.key))
         banner.fadeIn(220, 16f)
         handler.removeCallbacks(hideBannerTask)
         handler.postDelayed(hideBannerTask, 5_000)
@@ -694,7 +783,7 @@ class MainActivity : AppCompatActivity() {
                 val n = channelLanguages.count { code in it.value }
                 if (n > 0) add(GuideCategory("$LANGUAGE$code", languageNames[code] ?: code, n, R.drawable.ic_language))
             }
-            counts.forEach { (id, n) -> add(GuideCategory(id, Categories.label(id), n, Categories.icon(id))) }
+            counts.forEach { (id, n) -> add(GuideCategory(id, Categories.label(this@MainActivity, id), n, Categories.icon(id))) }
         }
     }
 
@@ -828,7 +917,7 @@ class MainActivity : AppCompatActivity() {
         const val MAX_SKIPS = 12
         const val MAX_RETRIES = 2
         const val RETRY_DELAY_MS = 3_000L
-        const val DEFAULT_USER_AGENT =
-            "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+        const val PROBE_PARALLEL = 6
+        const val DEFAULT_USER_AGENT = StreamProbe.DEFAULT_USER_AGENT
     }
 }

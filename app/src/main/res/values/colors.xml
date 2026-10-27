@@ -15,4 +15,6 @@
     <color name="panel">#E6070D1F</color>
     <color name="item_active">#1FFFFFFF</color>
     <color name="success">#3DDC84</color>
+    <color name="signal_weak">#FF5A5A</color>
+    <color name="signal_dim">#3AFFFFFF</color>
 </resources>

@@ -26,7 +26,7 @@ sealed interface PickRow {
  * maybe a second line, and a tick or an arrow on the right. Headers split the sections.
  */
 class PickAdapter(
-    private val trailing: Trailing,
+    var trailing: Trailing,
     private val onPick: (PickRow.Item) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

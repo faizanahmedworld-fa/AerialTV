@@ -17,7 +17,9 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 * Languages: up to three of the viewer's languages are fetched as iptv-org language playlists (`languages/urd.m3u` and so on, cached for a day) and matched to the country's channels by `tvg-id`. Each language with matches gets its own row in the category list. `app/src/main/assets/languages.json` is the list offered, with the countries each one is suggested for.
 * Search: the box above the channel list matches name, number or category. The Search key on a remote opens the list with the box focused.
 * Playlists come from iptv-org.github.io, GitHub raw and jsDelivr, started 2.5 seconds apart, and the first good answer wins. Some ISPs block github.io. The last good list is cached for 6 hours and used offline.
-* Android 5.0 and up. APK is about 2 MB.
+* Signal bars (`StreamHealth.kt`, `SignalBarsView.kt`): after the channel list loads, every channel's first links are probed in the background, six at a time, favourites and For you first. How fast the server answers gives 4, 3 or 2 bars; no answer gives 1. While a channel plays, its bars come from how far ahead the player has buffered and how often it has stalled. Results are kept per country in `Prefs` for six hours, so the next start shows bars straight away and only stale channels are checked again. Probing pauses when the app is in the background.
+* App language: Settings, App language switches the menus with `AppCompatDelegate.setApplicationLocales`. Translations live in `app/src/main/res/values-<locale>/strings.xml` (zh-rCN, zh-rTW, ar, es, fr, de, pt, ru, hi, ur, tr, in) and the list of offered languages is `AppLanguages.kt`. `res/xml/locales_config.xml` tells Android 13+ the same list so the system per app language setting works too. Category names come from `Categories.label(context, id)`, which maps iptv-org's category ids to translated strings.
+* Android 5.0 and up. APK is about 2.3 MB.
 
 ## Project layout
 
@@ -35,6 +37,9 @@ Channels come from the public [iptv-org/iptv](https://github.com/iptv-org/iptv) 
 | `app/src/main/assets/languages.json` | Languages offered at setup (ISO 639-3 codes, the names of iptv-org's language playlists) and which countries suggest them |
 | `app/src/test/` | Parser tests against real Pakistan and Ukraine playlists, plus recommendation and search tests |
 | `tools/icons.ps1` | Draws the launcher icons and the Android TV banner |
+| `tools/playstore.ps1` | Draws the Play Store icon, feature graphic and TV banner into `docs/playstore` |
+| `docs/PlayStore.md` | Step by step Play Store publishing checklist, listing text and policy form answers |
+| `web/privacy/index.html` | Privacy policy page, linked from the Play listing |
 | `server/mirror.mjs` | Server job that builds health checked playlists for `MIRROR_URL`, plus browser safe copies for the web player |
 | `web/index.html` | The landing page people find through Google: what the app is, install steps, a link per country, structured data. Plain HTML, no build step |
 | `web/sitemap.xml`, `web/robots.txt`, `web/404.html`, `web/og.png`, `web/icon.png` | Search and sharing files for the landing page. The site address `https://faizanahmedworld-fa.github.io/AerialTV/` is written into the canonical links, Open Graph tags, JSON-LD and sitemap, so search and replace it when the site moves to its own domain |

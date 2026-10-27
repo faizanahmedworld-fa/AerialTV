@@ -19,8 +19,8 @@ android {
         applicationId = "tv.aerialtv.app"
         minSdk = 21
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
 
         // Optional mirror of the iptv-org playlists on your own domain, e.g.
         // "https://aerialtv.tv/lists/%s.m3u". Tried first when set.

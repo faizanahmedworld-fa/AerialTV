@@ -89,6 +89,33 @@ class Prefs(context: Context) {
         sp.edit().putString("history_$country", o.toString()).apply()
     }
 
+    // endregion
+
+    // region signal bars
+
+    fun health(country: String): Map<String, Health> {
+        val raw = sp.getString("health_$country", null) ?: return emptyMap()
+        return try {
+            val o = JSONObject(raw)
+            buildMap {
+                for (key in o.keys()) {
+                    val a = o.getJSONArray(key)
+                    put(key, Health(a.getInt(0), a.getLong(1)))
+                }
+            }
+        } catch (e: Exception) {
+            emptyMap()
+        }
+    }
+
+    fun saveHealth(country: String, map: Map<String, Health>) {
+        val o = JSONObject()
+        map.forEach { (k, v) -> o.put(k, JSONArray().put(v.bars).put(v.at)) }
+        sp.edit().putString("health_$country", o.toString()).apply()
+    }
+
+    // endregion
+
     fun clearHistoryAndFavorites() {
         val e = sp.edit()
         sp.all.keys.filter { it.startsWith("history_") || it.startsWith("last_") }.forEach { e.remove(it) }

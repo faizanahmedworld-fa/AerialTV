@@ -158,13 +158,37 @@
                 android:textAppearance="@style/Aerial.Text.Title"
                 android:textSize="26sp" />
 
-            <TextView
-                android:id="@+id/bannerInfo"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textAppearance="@style/Aerial.Text.Body"
-                android:textSize="15sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/bannerInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxWidth="340dp"
+                    android:maxLines="1"
+                    android:textAppearance="@style/Aerial.Text.Body"
+                    android:textSize="15sp" />
+
+                <tv.aerialtv.app.SignalBarsView
+                    android:id="@+id/bannerSignal"
+                    android:layout_width="24dp"
+                    android:layout_height="17dp"
+                    android:layout_marginStart="14dp" />
+
+                <TextView
+                    android:id="@+id/bannerSignalText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:textAppearance="@style/Aerial.Text.Caption"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"

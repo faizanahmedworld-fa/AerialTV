@@ -66,6 +66,7 @@ class CategoryAdapter(
 
 class ChannelAdapter(
     private val isFavorite: (Channel) -> Boolean,
+    private val signalOf: (Channel) -> Int,
     private val onClick: (Channel) -> Unit,
     private val onLongClick: (Channel) -> Unit,
 ) : RecyclerView.Adapter<ChannelAdapter.Holder>() {
@@ -94,6 +95,16 @@ class ChannelAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         Holder(LayoutInflater.from(parent.context).inflate(R.layout.item_channel, parent, false))
 
+    /** Only the bars changed: repaint them without touching focus or the logo. */
+    override fun onBindViewHolder(holder: Holder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isEmpty()) return super.onBindViewHolder(holder, position, payloads)
+        holder.signal.bars = signalOf(items[position])
+    }
+
+    fun refreshSignals() {
+        if (itemCount > 0) notifyItemRangeChanged(0, itemCount, SIGNAL)
+    }
+
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val ch = items[position]
         val ctx = holder.itemView.context
@@ -102,7 +113,8 @@ class ChannelAdapter(
         holder.name.text = ch.name
         holder.name.setTextColor(ContextCompat.getColor(ctx, if (playing) R.color.accent else R.color.text_primary))
         holder.playing.visibility = if (playing) View.VISIBLE else View.GONE
-        holder.category.text = ch.categories.joinToString("  ·  ") { Categories.label(it) }
+        holder.category.text = ch.categories.joinToString("  ·  ") { Categories.label(ctx, it) }
+        holder.signal.bars = signalOf(ch)
         holder.favorite.visibility = if (isFavorite(ch)) View.VISIBLE else View.GONE
         holder.logo.loadLogo(ch.logo)
         holder.itemView.setOnClickListener { onClick(ch) }
@@ -121,5 +133,10 @@ class ChannelAdapter(
         val category: TextView = view.findViewById(R.id.channelCategory)
         val favorite: ImageView = view.findViewById(R.id.channelFavorite)
         val playing: ImageView = view.findViewById(R.id.channelPlaying)
+        val signal: SignalBarsView = view.findViewById(R.id.channelSignal)
+    }
+
+    private companion object {
+        const val SIGNAL = "signal"
     }
 }

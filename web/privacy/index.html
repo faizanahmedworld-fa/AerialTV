@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070D1F">
+<title>Aerial TV privacy policy</title>
+<meta name="description" content="What Aerial TV does and does not collect. Short answer: nothing leaves your device except the requests needed to play free public TV streams.">
+<link rel="canonical" href="https://faizanahmedworld-fa.github.io/AerialTV/privacy/">
+<link rel="icon" href="../icon.png">
+<style>
+  :root {
+    --bg: #070D1F; --card: #121F45; --line: rgba(184,194,220,.16);
+    --text: #FFFFFF; --muted: #B8C2DC; --amber: #FFB020;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 17px/1.6 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+  a { color: var(--amber); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 22px; margin: 36px 0 8px; }
+  p, li { color: var(--muted); }
+  .date { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; margin: 24px 0; }
+  .card p { margin: 0; color: var(--text); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  td, th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--muted); vertical-align: top; }
+  th { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="../">Aerial TV</a></p>
+  <h1>Privacy policy</h1>
+  <p class="date">Last updated 27 October 2026. Applies to Aerial TV for Android, Android TV, Fire TV, Windows and the web player.</p>
+
+  <div class="card">
+    <p>Aerial TV has no accounts, no sign in, no analytics and no advertising network. Nothing you do in the app is sent to us, because there is no server of ours to send it to.</p>
+  </div>
+
+  <h2>What stays on your device</h2>
+  <p>The app saves a few things so it works like a normal TV. All of it lives in the app's private storage on your device and is deleted when you uninstall the app or clear its data.</p>
+  <ul>
+    <li>The country, "who's watching", interests and languages you picked at first run.</li>
+    <li>The menu language, if you changed it in Settings.</li>
+    <li>Your favourite channels and the last channel you watched.</li>
+    <li>A small watch history (which channels you left on and for how long) that builds the Most watched row. It is capped at 60 channels per country.</li>
+    <li>How quickly each channel's stream answered, which draws the signal bars.</li>
+    <li>A cached copy of the channel list so the app starts offline.</li>
+  </ul>
+  <p>You can wipe favourites and history any time from Settings, Clear favourites and history.</p>
+
+  <h2>What leaves your device</h2>
+  <table>
+    <tr><th>Request</th><th>Sent to</th><th>Why</th></tr>
+    <tr><td>Channel list download</td><td>iptv-org.github.io, raw.githubusercontent.com or cdn.jsdelivr.net</td><td>To get the free public playlist for your country. These are the open iptv-org project files. The request carries your IP address, like any web request, and an app version string.</td></tr>
+    <tr><td>Video streams and channel logos</td><td>The broadcaster or host that publishes each stream</td><td>To play the channel you picked. Each stream host sees your IP address and a standard browser style user agent. We do not control those hosts and their own privacy terms apply.</td></tr>
+    <tr><td>Signal check</td><td>The same stream hosts</td><td>A short request to each channel's link to see whether it answers, so the signal bars in the list mean something. Nothing about you is included.</td></tr>
+  </table>
+
+  <h2>What we never do</h2>
+  <ul>
+    <li>No account, email, phone number or name is asked for or stored.</li>
+    <li>No location access. The country suggestion comes from your device's time zone and language settings, read on the device only.</li>
+    <li>No analytics, crash reporting or tracking SDKs. No cookies in the apps.</li>
+    <li>No selling or sharing of data, because none is collected.</li>
+    <li>No video is hosted by us. Aerial TV is a player for streams that broadcasters already publish openly.</li>
+  </ul>
+
+  <h2>Permissions</h2>
+  <p>The Android app asks for internet access and network state only. It needs no storage, camera, microphone, contacts or location permission.</p>
+
+  <h2>Children</h2>
+  <p>The app is not aimed at children, though the Kids profile puts cartoon and learning channels first. We collect no personal data from anyone, children included.</p>
+
+  <h2>Changes</h2>
+  <p>If the app ever starts collecting anything, this page will say so first and the app version notes will point to it. Until then, this policy holds.</p>
+
+  <h2>Contact</h2>
+  <p>Questions go to the project's GitHub page: <a href="https://github.com/faizanahmedworld-fa/AerialTV/issues">github.com/faizanahmedworld-fa/AerialTV/issues</a>.</p>
+</div>
+</body>
+</html>

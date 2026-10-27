@@ -103,8 +103,42 @@ object Categories {
 
     fun rank(category: String): Int = order.indexOf(category).let { if (it < 0) order.size - 1 else it }
 
-    fun label(category: String): String =
-        if (category == "undefined") "Other" else category.replaceFirstChar { it.uppercase() }
+    private val labels = mapOf(
+        "general" to R.string.category_general,
+        "news" to R.string.category_news,
+        "entertainment" to R.string.category_entertainment,
+        "movies" to R.string.category_movies,
+        "series" to R.string.category_series,
+        "sports" to R.string.category_sports,
+        "kids" to R.string.category_kids,
+        "animation" to R.string.category_animation,
+        "family" to R.string.category_family,
+        "music" to R.string.category_music,
+        "documentary" to R.string.category_documentary,
+        "comedy" to R.string.category_comedy,
+        "lifestyle" to R.string.category_lifestyle,
+        "cooking" to R.string.category_cooking,
+        "travel" to R.string.category_travel,
+        "outdoor" to R.string.category_outdoor,
+        "culture" to R.string.category_culture,
+        "education" to R.string.category_education,
+        "science" to R.string.category_science,
+        "business" to R.string.category_business,
+        "religious" to R.string.category_religious,
+        "legislative" to R.string.category_legislative,
+        "classic" to R.string.category_classic,
+        "auto" to R.string.category_auto,
+        "weather" to R.string.category_weather,
+        "shop" to R.string.category_shop,
+        "public" to R.string.category_public,
+        "relax" to R.string.category_relax,
+        "interactive" to R.string.category_interactive,
+        "undefined" to R.string.category_undefined,
+    )
+
+    /** The category in the menu language. Anything iptv-org adds later shows in plain English. */
+    fun label(context: android.content.Context, category: String): String =
+        labels[category]?.let { context.getString(it) } ?: category.replaceFirstChar { it.uppercase() }
 
     fun icon(category: String): Int = icons[category] ?: R.drawable.ic_label
 }

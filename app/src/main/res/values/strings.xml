@@ -43,7 +43,7 @@
     <string name="step_interests_title">What do you like to watch?</string>
     <string name="step_interests_subtitle">Pick as many as you like. Your For you list is built from these.</string>
     <string name="step_languages_title">Which languages do you watch in?</string>
-    <string name="step_languages_subtitle">Channels in these languages get a boost. The ones people in your country usually want are at the top.</string>
+    <string name="step_languages_subtitle">Channels in these languages get a boost and their own row in the list. This doesn\'t change the app\'s own menus: for that, open Settings and pick App language.</string>
     <string name="step_done_title">You\'re all set</string>
     <string name="step_done_subtitle">Your For you list is ready. Hold OK on any channel to add it to Favourites, and press OK while watching to open the list.</string>
     <string name="next">Next</string>
@@ -84,6 +84,10 @@
     <string name="settings_profile">Who\'s watching</string>
     <string name="settings_interests">Interests</string>
     <string name="settings_languages">Languages</string>
+    <string name="settings_app_language">App language</string>
+    <string name="settings_app_language_desc">Menus and messages are in %1$s</string>
+    <string name="app_language_system">Same as the TV</string>
+    <string name="app_language_title">Which language should the menus use?</string>
     <string name="settings_rerun">Run setup again</string>
     <string name="settings_rerun_desc">Walk through the first run steps from the start</string>
     <string name="settings_clear">Clear favourites and history</string>
@@ -92,4 +96,43 @@
     <string name="settings_about">About Aerial TV</string>
     <string name="settings_about_desc">Version %1$s. Free public streams listed by iptv-org. No video is hosted by us.</string>
     <string name="not_set">Not set</string>
+
+    <!-- Signal bars: how well a channel's stream answers -->
+    <string name="signal_checking">Checking signal</string>
+    <string name="signal_weak">Weak signal</string>
+    <string name="signal_fair">Fair signal</string>
+    <string name="signal_good">Good signal</string>
+    <string name="signal_strong">Strong signal</string>
+
+    <!-- Channel categories, as iptv-org names them -->
+    <string name="category_general">General</string>
+    <string name="category_news">News</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_movies">Movies</string>
+    <string name="category_series">Series</string>
+    <string name="category_sports">Sports</string>
+    <string name="category_kids">Kids</string>
+    <string name="category_animation">Animation</string>
+    <string name="category_family">Family</string>
+    <string name="category_music">Music</string>
+    <string name="category_documentary">Documentary</string>
+    <string name="category_comedy">Comedy</string>
+    <string name="category_lifestyle">Lifestyle</string>
+    <string name="category_cooking">Cooking</string>
+    <string name="category_travel">Travel</string>
+    <string name="category_outdoor">Outdoor</string>
+    <string name="category_culture">Culture</string>
+    <string name="category_education">Education</string>
+    <string name="category_science">Science</string>
+    <string name="category_business">Business</string>
+    <string name="category_religious">Religious</string>
+    <string name="category_legislative">Legislative</string>
+    <string name="category_classic">Classic</string>
+    <string name="category_auto">Auto</string>
+    <string name="category_weather">Weather</string>
+    <string name="category_shop">Shopping</string>
+    <string name="category_public">Public</string>
+    <string name="category_relax">Relax</string>
+    <string name="category_interactive">Interactive</string>
+    <string name="category_undefined">Other</string>
 </resources>

@@ -54,6 +54,12 @@
             android:textAppearance="@style/Aerial.Text.Caption" />
     </LinearLayout>
 
+    <tv.aerialtv.app.SignalBarsView
+        android:id="@+id/channelSignal"
+        android:layout_width="22dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="10dp" />
+
     <ImageView
         android:id="@+id/channelPlaying"
         android:layout_width="20dp"

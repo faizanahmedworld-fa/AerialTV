@@ -28,6 +28,8 @@ Aerial TV is a free IPTV player for Android TV, Google TV, Fire TV Stick, Androi
 * A short setup asks who's watching (kids, family or adults), what you like and which languages you speak. That builds a For you row, and Most watched fills itself from what you actually leave on.
 * Search channels by name, number or type ("sport", "news") from the channel list. Settings lets you change any answer later.
 * Made for a remote: up and down change channel, number keys jump to a channel, OK opens the list, and holding OK adds a favourite.
+* Signal bars next to every channel show which streams are answering right now, and the banner shows how well the one you're watching is holding up.
+* Menus in English, Chinese (simplified and traditional), Arabic, Spanish, French, German, Portuguese, Russian, Hindi, Urdu, Turkish and Indonesian. Pick one under Settings, App language, or leave it on the TV's own language.
 * Dead free streams are skipped on their own, and channels with backup links try each one first.
 * It remembers your last channel and your favourites, and both survive an update.
 * Runs on Android TV, Google TV, Fire TV Stick, Android phones, Windows, and in Safari or Chrome (with AirPlay to an Apple TV).
